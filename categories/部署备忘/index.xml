@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>部署备忘 on ratmomo's blog</title><link>https://ratmomo.github.io/categories/%E9%83%A8%E7%BD%B2%E5%A4%87%E5%BF%98/</link><description>Recent content in 部署备忘 on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 31 May 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://ratmomo.github.io/categories/%E9%83%A8%E7%BD%B2%E5%A4%87%E5%BF%98/index.xml" rel="self" type="application/rss+xml"/><item><title>使用 Hugo + Github Pages 部署个人博客</title><link>https://ratmomo.github.io/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</link><pubDate>Fri, 31 May 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</guid><description>&lt;img src="https://ratmomo.github.io/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/cover.jpg" alt="Featured image of post 使用 Hugo + Github Pages 部署个人博客" />&lt;h2 id="配置环境">配置环境
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>部署备忘 on ratmomo's blog</title><link>https://ratmomo.github.io/categories/%E9%83%A8%E7%BD%B2%E5%A4%87%E5%BF%98/</link><description>Recent content in 部署备忘 on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 07 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://ratmomo.github.io/categories/%E9%83%A8%E7%BD%B2%E5%A4%87%E5%BF%98/index.xml" rel="self" type="application/rss+xml"/><item><title>使用 Hugo + Github Pages 部署个人博客</title><link>https://ratmomo.github.io/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</link><pubDate>Fri, 07 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</guid><description>&lt;img src="https://ratmomo.github.io/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/cover.jpg" alt="Featured image of post 使用 Hugo + Github Pages 部署个人博客" />&lt;h2 id="配置环境">配置环境
 &lt;/h2>&lt;ul>
 &lt;li>Windows PC一台且已经安装有Git&lt;/li>
 &lt;li>Github账号一个&lt;/li>
@@ -384,7 +384,7 @@ data-flex-basis="222px"
 &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;p>在&lt;a class="link" href="https://github.com/settings/profile" target="_blank" rel="noopener"
->Github Profile&lt;/a>页面下&lt;strong>Developer setting - Personal access tokens&lt;/strong>中创建一个tokens，注意勾选&lt;code>repo&lt;/code>和&lt;code>workflow&lt;/code>权限&lt;/p>
+>Github Profile&lt;/a>页面下&lt;strong>Developer setting - Personal access tokens&lt;/strong>中创建一个tokens，注意勾选&lt;strong>repo&lt;/strong>和&lt;strong>workflow&lt;/strong>权限&lt;/p>
 &lt;p>&lt;img src="https://ratmomo.github.io/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/7.png"
 width="782"
 height="579"
@@ -405,4 +405,17 @@ data-flex-grow="195"
 data-flex-basis="468px"
 >&lt;/p>
 &lt;p>接下来直接push本地的修改到远程博客源仓库，Github Action会为我们完成生成静态页面和推送到GitHub Pages仓库的任务&lt;/p>
-&lt;p>如果之前配置的推送目标时gh-pages分支，注意将GitHub Pages仓库的&lt;strong>Sittings - Pages - Build and deployment - Branch&lt;/strong>修改为gh-pages&lt;/p></description></item></channel></rss>
+&lt;p>如果之前配置的推送目标时gh-pages分支，注意将GitHub Pages仓库的&lt;strong>Sittings - Pages - Build and deployment - Branch&lt;/strong>修改为gh-pages&lt;/p>
+&lt;h2 id="参考">参考
+&lt;/h2>&lt;blockquote>
+&lt;p>&lt;a class="link" href="https://gohugo.io/documentation/" target="_blank" rel="noopener"
+>Hugo Documentation | Hugo&lt;/a>
+&lt;a class="link" href="https://stack.jimmycai.com/config/site" target="_blank" rel="noopener"
+>Site-wide settings | Stack&lt;/a>
+&lt;a class="link" href="https://cuttontail.blog/blog/create-a-wesite-using-github-pages-and-hugo/#8-%E6%9C%AC%E5%9C%B0%E8%B0%83%E8%AF%95%E5%92%8C%E9%A2%84%E8%A7%88" target="_blank" rel="noopener"
+>如何用 GitHub Pages + Hugo 搭建个人博客 · 小绵尾巴&lt;/a>
+&lt;a class="link" href="https://www.lixueduan.com/posts/blog/02-add-giscus-comment/#5-%E9%85%8D%E7%BD%AE%E5%88%B0%E5%8D%9A%E5%AE%A2" target="_blank" rel="noopener"
+>Hugo 博客引入 Giscus 评论系统 -&lt;/a>
+&lt;a class="link" href="https://www.pseudoyu.com/zh/2022/05/29/deploy_your_blog_using_hugo_and_github_action/" target="_blank" rel="noopener"
+>Hugo + GitHub Action，搭建你的博客自动发布系统 · Pseudoyu&lt;/a>&lt;/p>
+&lt;/blockquote></description></item></channel></rss>
