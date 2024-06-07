@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=11808&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Bitwarden密码管理器 Bitwarden是一款开源跨平台的密码管理器，你可以选择自己部署密码库，而不需要经过第三方的服务器。总之为了摆">
 <title>使用Docker部署安装Bitwarden</title>
 
-<link rel='canonical' href='http://localhost:1313/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/'>
+<link rel='canonical' href='http://localhost:11808/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/'>
 
 <link rel="stylesheet" href="/scss/style.min.e8c7fca7d1c9294aa7a4f3426c225ee26540f7d94e39be0b5a4a5c8a49ca5a25.css"><meta property='og:title' content="使用Docker部署安装Bitwarden">
 <meta property='og:description' content="Bitwarden密码管理器 Bitwarden是一款开源跨平台的密码管理器，你可以选择自己部署密码库，而不需要经过第三方的服务器。总之为了摆">
-<meta property='og:url' content='http://localhost:1313/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/'>
+<meta property='og:url' content='http://localhost:11808/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/'>
 <meta property='og:site_name' content='ratmomo&#39;s blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-06-01T22:26:04&#43;08:00'/><meta property='article:modified_time' content='2024-06-01T22:26:04&#43;08:00'/><meta property='og:image' content='http://localhost:1313/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-06-01T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-06-01T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:11808/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover.jpg' />
 <meta name="twitter:title" content="使用Docker部署安装Bitwarden">
 <meta name="twitter:description" content="Bitwarden密码管理器 Bitwarden是一款开源跨平台的密码管理器，你可以选择自己部署密码库，而不需要经过第三方的服务器。总之为了摆"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='http://localhost:1313/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover.jpg' />
+    <meta name="twitter:image" content='http://localhost:11808/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover.jpg' />
     <link rel="shortcut icon" href="/favicon.ico" />
 
   
@@ -234,6 +234,7 @@
     <li><a href="#部署bitwarden">部署Bitwarden</a></li>
     <li><a href="#设置反代">设置反代</a></li>
     <li><a href="#番外篇导入edgechrome密码">番外篇：导入Edge/Chrome密码</a></li>
+    <li><a href="#参考">参考</a></li>
   </ol>
 </nav>
         </div>
@@ -321,10 +322,6 @@
     <section class="article-content">
     
     
-    
-    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=86
-    src="//music.163.com/outchain/player?type=2&id=556053856&auto=0&height=66">
-</iframe>
     
     <h2 id="bitwarden密码管理器">Bitwarden密码管理器
 </h2><p>Bitwarden是一款开源跨平台的密码管理器，你可以选择自己部署密码库，而不需要经过第三方的服务器。总之为了摆脱恼人的Edge，首先要部署代替的密码管理器和迁移密码。</p>
@@ -562,14 +559,15 @@
 		data-flex-basis="343px"
 	
 ></p>
-<blockquote>
+<h2 id="参考">参考
+</h2><blockquote>
 <p><a class="link" href="https://bitwarden.com/help/install-on-premise-linux/"  target="_blank" rel="noopener"
-    >Linux Standard Deployment | Bitwarden Help Center</a></p>
-<p><a class="link" href="https://www.horosama.com/archives/338"  target="_blank" rel="noopener"
-    >bitwarden部署和使用记录 – 萌萌哒赫萝的小站</a></p>
-<p><a class="link" href="https://blog.xollipop.top/2023/06/01/bitwarden/"  target="_blank" rel="noopener"
-    >如何搭建一个私人的bitwarden密码管理工具服务端(保姆级教程) | Sola&rsquo;s Blog</a></p>
-<p><a class="link" href="https://bitwarden.com/help/import-from-chrome/"  target="_blank" rel="noopener"
+    >Linux Standard Deployment | Bitwarden Help Center</a>
+<a class="link" href="https://www.horosama.com/archives/338"  target="_blank" rel="noopener"
+    >bitwarden部署和使用记录 – 萌萌哒赫萝的小站</a>
+<a class="link" href="https://blog.xollipop.top/2023/06/01/bitwarden/"  target="_blank" rel="noopener"
+    >如何搭建一个私人的bitwarden密码管理工具服务端(保姆级教程) | Sola&rsquo;s Blog</a>
+<a class="link" href="https://bitwarden.com/help/import-from-chrome/"  target="_blank" rel="noopener"
     >Import Data from Google Chrome | Bitwarden Help Center</a></p>
 </blockquote>
 
@@ -628,6 +626,30 @@
     <h2 class="section-title">Related content</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/">
+        
+        
+            <div class="article-image">
+                <img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.d22b0a1cde9be772d6636cc72c3aed2b_hu5459c0360c2b0cb7a147d2df0eb350ca_1084121_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post [All in One]在物理机上安装PVE"
+                        
+                        data-hash="md5-0isKHN6b53LWY2zHLDrtKw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">[All in One]在物理机上安装PVE</h2>
+        </div>
+    </a>
+</article>
+
             
                 
 <article class="has-image">
