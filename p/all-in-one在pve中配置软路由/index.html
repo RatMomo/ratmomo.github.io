@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=7120&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="前言 为了摆脱PC用网线直连主机来操作pve的窘境，我们在PVE中首当其冲应该安装的部分就是软路由，主流的软路由有iKuai和OpenWrt等">
+<title>[All in One]在PVE中配置软路由</title>
+
+<link rel='canonical' href='http://localhost:7120/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/'>
+
+<link rel="stylesheet" href="/scss/style.min.e8c7fca7d1c9294aa7a4f3426c225ee26540f7d94e39be0b5a4a5c8a49ca5a25.css"><meta property='og:title' content="[All in One]在PVE中配置软路由">
+<meta property='og:description' content="前言 为了摆脱PC用网线直连主机来操作pve的窘境，我们在PVE中首当其冲应该安装的部分就是软路由，主流的软路由有iKuai和OpenWrt等">
+<meta property='og:url' content='http://localhost:7120/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/'>
+<meta property='og:site_name' content='ratmomo&#39;s blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-06-07T20:26:41&#43;08:00'/><meta property='article:modified_time' content='2024-06-07T20:26:41&#43;08:00'/><meta property='og:image' content='http://localhost:7120/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/cover.jpg' />
+<meta name="twitter:title" content="[All in One]在PVE中配置软路由">
+<meta name="twitter:description" content="前言 为了摆脱PC用网线直连主机来操作pve的窘境，我们在PVE中首当其冲应该安装的部分就是软路由，主流的软路由有iKuai和OpenWrt等"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='http://localhost:7120/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/cover.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+  
+    
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-NDQ9GXXBVM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-NDQ9GXXBVM');
+        }
+      </script>
+    
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huf646c680e2e59af620b0b48da0cef2a5_1117589_300x0_resize_box_3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">ratmomo&#39;s blog</a></h1>
+            <h2 class="site-description">朝闻道，夕死可矣</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/RatMomo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#部署前的准备">部署前的准备</a></li>
+    <li><a href="#为软路由准备虚拟机">为软路由准备虚拟机</a></li>
+    <li><a href="#安装istoreos固件">安装iStoreOS固件</a></li>
+    <li><a href="#配置istoreos作为旁路由">配置iStoreOS作为旁路由</a></li>
+    <li><a href="#结尾">结尾</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+    <div class="article-image">
+        <a href="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/">
+            <img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/cover_hu5459c0360c2b0cb7a147d2df0eb350ca_3254561_800x0_resize_q75_box.jpg" srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/cover_hu5459c0360c2b0cb7a147d2df0eb350ca_3254561_800x0_resize_q75_box.jpg 800w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/cover_hu5459c0360c2b0cb7a147d2df0eb350ca_3254561_1600x0_resize_q75_box.jpg 1600w"  width="800"
+                height="533" loading="lazy" alt="Featured image of post [All in One]在PVE中配置软路由" />
+            
+        </a>
+    </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E9%83%A8%E7%BD%B2%E5%A4%87%E5%BF%98/" style="background-color: #2a9d8f; color: #fff;">
+                部署备忘
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/">[All in One]在PVE中配置软路由</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jun 07, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=86
+    src="//music.163.com/outchain/player?type=2&id=477839732&auto=0&height=66">
+</iframe>
+    
+    <h2 id="前言">前言
+</h2><p>为了摆脱PC用网线直连主机来操作pve的窘境，我们在PVE中首当其冲应该安装的部分就是软路由，主流的软路由有<strong>iKuai</strong>和<strong>OpenWrt</strong>等，<strong>OpenWrt</strong>又有着许多的发行版，这里我们用<strong>iStoreOS</strong>为例，在PVE中安装软路由</p>
+<h2 id="部署前的准备">部署前的准备
+</h2><ul>
+<li>一台成功安装PVE的主机</li>
+</ul>
+<h2 id="为软路由准备虚拟机">为软路由准备虚拟机
+</h2><p>在PVE管理页面的右上角选择创建虚拟机，<strong>名称</strong>任意,<strong>VM ID</strong>可以修改但不能冲突，这里使用默认，下一步</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1.png"
+	width="720"
+	height="540"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1_hu699122af892996bf585443cfa25ea0d5_24555_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1_hu699122af892996bf585443cfa25ea0d5_24555_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="320px"
+	
+></p>
+<p>软路由的安装比较特殊，这里选择不使用任何介质</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2.png"
+	width="720"
+	height="540"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2_hu0cee02120b2c9a165f3c3e4238f2cb7e_33423_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2_hu0cee02120b2c9a165f3c3e4238f2cb7e_33423_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="320px"
+	
+></p>
+<p>由于没有使用UEFI的固件，这里保持默认，下一步</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3.png"
+	width="720"
+	height="540"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3_huc1b9a9237f58ee84ea8b7616cb468d71_30151_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3_huc1b9a9237f58ee84ea8b7616cb468d71_30151_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="320px"
+	
+></p>
+<p>不需要创建磁盘，直接点击删除，下一步</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4.png"
+	width="720"
+	height="540"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4_hufef3690b0996a6d2c0159a25a06c69c0_35732_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4_hufef3690b0996a6d2c0159a25a06c69c0_35732_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="320px"
+	
+></p>
+<p><strong>核心数</strong>和<strong>插槽</strong>根据你的平台决定，软路由性能需求不高，可以保持默认，或者也可以设置到与你的平台情况一致，PVE会动态分配资源，无需担心类别可以保持默认，也可以选择host（据说性能更好）</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6.png"
+	width="720"
+	height="540"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6_hu3914c277acb1998541c6a22203b3a8cd_24143_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6_hu3914c277acb1998541c6a22203b3a8cd_24143_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="320px"
+	
+></p>
+<p>内存分配随意，这里保持默认</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7.png"
+	width="720"
+	height="540"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7_hu7239a720725eef863bd773375ab261db_22399_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7_hu7239a720725eef863bd773375ab261db_22399_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="320px"
+	
+></p>
+<p>网络保持默认即可，模型使用<strong>半虚拟化</strong>据说性能更佳，但可能不兼容某些老设备</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8.png"
+	width="720"
+	height="540"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8_hu6e6becf96bcf73f7ffa542d234481912_29296_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8_hu6e6becf96bcf73f7ffa542d234481912_29296_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="320px"
+	
+></p>
+<h2 id="安装istoreos固件">安装iStoreOS固件
+</h2><p>在<a class="link" href="https://fw.koolcenter.com/iStoreOS/"  target="_blank" rel="noopener"
+    >KoolCenter 固件下载服务器</a>中下载自己平台对应的固件，由于我们使用的是PVE虚拟机，这里就下载x86_64的固件，下载完成后解压</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image.png"
+	width="1109"
+	height="36"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image_hu4a8d5d1f12812648351b126efcc89737_5217_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image_hu4a8d5d1f12812648351b126efcc89737_5217_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="3080"
+		data-flex-basis="7393px"
+	
+></p>
+<p>依次点击<strong>local - ISO镜像 - 上传</strong>，将iStoreOS的镜像上传，注意复制一下你的文件名，等会需要使用</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10.png"
+	width="404"
+	height="269"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10_hu08db59084c4d17231a679b56bc895b39_12745_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10_hu08db59084c4d17231a679b56bc895b39_12745_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="150"
+		data-flex-basis="360px"
+	
+></p>
+<p>选择宿主机的Shell功能，执行命令，这里的iso文件名是你即刚刚上传时的文件名</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">qm importdisk <span class="m">100</span> /var/lib/vz/template/iso/istoreos-22.03.6-2024051012-x86-64-squashfs-combined.img local-lvm
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>选择软路由虚拟机，选择<strong>硬件</strong>，双击未使用的磁盘，点击添加，可以扩容一下磁盘，但不是必要的</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9.png"
+	width="676"
+	height="278"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9_hu5a404f922a2e3126f7e4a90626847515_36293_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9_hu5a404f922a2e3126f7e4a90626847515_36293_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="243"
+		data-flex-basis="583px"
+	
+></p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11.png"
+	width="600"
+	height="218"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11_hue4a06a61a7dd2d9d30ff3568b797b311_19618_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11_hue4a06a61a7dd2d9d30ff3568b797b311_19618_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="275"
+		data-flex-basis="660px"
+	
+></p>
+<p>注意到这里已经有了第一个网卡，点击左上角的<strong>添加 - 网络设备</strong>，将我们的第二个个网卡添加进去</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14.png"
+	width="600"
+	height="182"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14_hueabe0a70c57042b5451df8da4cf7c04d_20347_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14_hueabe0a70c57042b5451df8da4cf7c04d_20347_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="329"
+		data-flex-basis="791px"
+	
+></p>
+<p>选择软路由虚拟机，选择<strong>选项 - 引导顺序 -编辑</strong>，将刚刚添加的磁盘启动，并拖到最上方</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12.png"
+	width="1307"
+	height="727"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12_hu40741c1752d19b6b64e5824f2541c7a6_98116_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12_hu40741c1752d19b6b64e5824f2541c7a6_98116_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="179"
+		data-flex-basis="431px"
+	
+></p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13.png"
+	width="640"
+	height="267"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13_hu538f830d61e66881cd00ada61bd9a519_19478_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13_hu538f830d61e66881cd00ada61bd9a519_19478_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="239"
+		data-flex-basis="575px"
+	
+></p>
+<h2 id="配置istoreos作为旁路由">配置iStoreOS作为旁路由
+</h2><p>此时启动软路由虚拟机，点击控制台，等待引导结束，系统启动</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15.png"
+	width="2250"
+	height="1037"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15_hubb8fd10a056ea98441e24069ad03a1c1_420930_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15_hubb8fd10a056ea98441e24069ad03a1c1_420930_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="216"
+		data-flex-basis="520px"
+	
+></p>
+<p>按下回车键，进入命令行，输入命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">quickstart
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用上下键选择选项<strong>2</strong>
+<img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16.png"
+	width="390"
+	height="159"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16_hu8e60265e5638429e2ce929bcae0d7be8_43134_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16_hu8e60265e5638429e2ce929bcae0d7be8_43134_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="245"
+		data-flex-basis="588px"
+	
+></p>
+<p>这里输入之前为虚拟机预留的ip，我这里是<code>192.168.99.2</code>，子网掩码输入<code>255.255.255.0</code>，使用上下键选择<code>quit</code>离开，重启虚拟机</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17.png"
+	width="623"
+	height="42"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17_hu90c1e1d2a38a8a954073b1123b14c787_9012_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17_hu90c1e1d2a38a8a954073b1123b14c787_9012_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1483"
+		data-flex-basis="3560px"
+	
+></p>
+<p>此时便可以在浏览器中输入<code>192.168.99.2</code>进入iStoreOS的管理界面，默认的密码是<code>password</code></p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18.png"
+	width="420"
+	height="486"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18_hubfed1aa8e475298edb060dc40795db4d_146850_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18_hubfed1aa8e475298edb060dc40795db4d_146850_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="86"
+		data-flex-basis="207px"
+	
+></p>
+<p>虽然在出现危险的可能性不大，但还是建议现在<strong>系统 - 管理权 - 路由器密码</strong>处先修改密码</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19.png"
+	width="1123"
+	height="488"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19_hu225cfc792244915e1e580a7eefcf385a_52990_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19_hu225cfc792244915e1e580a7eefcf385a_52990_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="230"
+		data-flex-basis="552px"
+	
+></p>
+<p>点击<strong>网络向导</strong>，选择<strong>配置为旁路由</strong>，在<strong>手动配置</strong>中输入为<code>192.168.99.2</code>，网关为主路由地址，关闭<strong>DHCPv4服务</strong></p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20.png"
+	width="600"
+	height="886"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20_hueacf499a7a3140355ee3c5a391a7c974_59539_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20_hueacf499a7a3140355ee3c5a391a7c974_59539_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="67"
+		data-flex-basis="162px"
+	
+></p>
+<p>点击<strong>网络 - 接口 - lan - 编辑 - DHCP服务器 - 常规设置</strong>，选择<strong>忽略此接口</strong></p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21.png"
+	width="2428"
+	height="784"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21_hu7006440cdcf4cbbb1d31cdd8b46afff1_119439_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21_hu7006440cdcf4cbbb1d31cdd8b46afff1_119439_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="309"
+		data-flex-basis="743px"
+	
+></p>
+<p>此时拔掉PC与软路由相连的网线，将作为软路由作为lan口的网卡与主路由器的lan口连接，软路由能正常联网即表明配置成功，PC上的以太网设置可以还原了</p>
+<p>第二个网口也不能浪费，由于我的路由器是千兆网口，而主机和PC都是2.5G网卡，为了提高All in One主机与PC间的文件传输速度，我要将PC与主机的第二个网口相连，这里点击<strong>iStoreOS</strong>的<strong>网络 - 接口 - 设备</strong>，先配置第一个设备<strong>br-lan</strong>，将两个网卡桥接</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-22.png"
+	width="708"
+	height="365"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-22_hu5d6164cbf984034aaade1dd0ec0a3440_40144_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-22_hu5d6164cbf984034aaade1dd0ec0a3440_40144_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="193"
+		data-flex-basis="465px"
+	
+></p>
+<p>再选择<strong>添加设备配置</strong>，选择刚刚桥接的网卡，添加</p>
+<p><img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-23.png"
+	width="500"
+	height="378"
+	srcset="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-23_hu9219c1a566c94b70557327b718de1d5b_34390_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-23_hu9219c1a566c94b70557327b718de1d5b_34390_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="132"
+		data-flex-basis="317px"
+	
+></p>
+<p>这样当PC连接到主机的第二个网口时也能正常上网</p>
+<h2 id="结尾">结尾
+</h2><p>软路由的设置到这里就结束了，其他的功能的设置请参考网络上的资料</p>
+
+</section>
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+    <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/">
+        
+        
+            <div class="article-image">
+                <img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.d22b0a1cde9be772d6636cc72c3aed2b_hu5459c0360c2b0cb7a147d2df0eb350ca_1084121_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post [All in One]在物理机上安装PVE"
+                        
+                        data-hash="md5-0isKHN6b53LWY2zHLDrtKw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">[All in One]在物理机上安装PVE</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/cover.f430eed1f65133519d924af7f95ff036_huc004bd00789154600b0b30e83cc400c7_2055315_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用 Hugo &#43; Github Pages 部署个人博客"
+                        
+                        data-hash="md5-9DDu0fZRM1Gdkkr3&#43;V/wNg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用 Hugo &#43; Github Pages 部署个人博客</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover.01bfd83311051002de55d58cfe13fe71_hu9c8c653ca541d463556575e8448b0d08_2912832_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用Docker部署安装Bitwarden"
+                        
+                        data-hash="md5-Ab/YMxEFEALeVdWM/hP&#43;cQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用Docker部署安装Bitwarden</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="RatMomo/ratmomo.github.io"
+    data-repo-id="R_kgDOMBpFiw"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOMBpFi84Cfwtg"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="bottom"
+    data-theme="light"
+    data-lang="zh-CN"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 ratmomo&#39;s blog
+    </section>
+    
+    <section class="powerby">
+        
+            Good Morning, and in case I don't see you, good afternoon, good evening, and good night! <br/>
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
