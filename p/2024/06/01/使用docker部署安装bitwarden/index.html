@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=7120&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Bitwarden密码管理器 Bitwarden是一款开源跨平台的密码管理器，你可以选择自己部署密码库，而不需要经过第三方的服务器。总之为了摆">
+<title>使用Docker部署安装Bitwarden</title>
+
+<link rel='canonical' href='http://localhost:7120/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/'>
+
+<link rel="stylesheet" href="/scss/style.min.e8c7fca7d1c9294aa7a4f3426c225ee26540f7d94e39be0b5a4a5c8a49ca5a25.css"><meta property='og:title' content="使用Docker部署安装Bitwarden">
+<meta property='og:description' content="Bitwarden密码管理器 Bitwarden是一款开源跨平台的密码管理器，你可以选择自己部署密码库，而不需要经过第三方的服务器。总之为了摆">
+<meta property='og:url' content='http://localhost:7120/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/'>
+<meta property='og:site_name' content='ratmomo&#39;s blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-06-01T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-06-01T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:7120/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover.jpg' />
+<meta name="twitter:title" content="使用Docker部署安装Bitwarden">
+<meta name="twitter:description" content="Bitwarden密码管理器 Bitwarden是一款开源跨平台的密码管理器，你可以选择自己部署密码库，而不需要经过第三方的服务器。总之为了摆"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='http://localhost:7120/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+  
+    
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-NDQ9GXXBVM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-NDQ9GXXBVM');
+        }
+      </script>
+    
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huf646c680e2e59af620b0b48da0cef2a5_1117589_300x0_resize_box_3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">ratmomo&#39;s blog</a></h1>
+            <h2 class="site-description">朝闻道，夕死可矣</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/RatMomo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#bitwarden密码管理器">Bitwarden密码管理器</a></li>
+    <li><a href="#部署前的准备">部署前的准备</a></li>
+    <li><a href="#创建一个专门用于bitwarden的用户">创建一个专门用于Bitwarden的用户</a></li>
+    <li><a href="#部署bitwarden">部署Bitwarden</a></li>
+    <li><a href="#设置反代">设置反代</a></li>
+    <li><a href="#番外篇导入edgechrome密码">番外篇：导入Edge/Chrome密码</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+    <div class="article-image">
+        <a href="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/">
+            <img src="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover_hu9c8c653ca541d463556575e8448b0d08_2912832_800x0_resize_q75_box.jpg" srcset="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover_hu9c8c653ca541d463556575e8448b0d08_2912832_800x0_resize_q75_box.jpg 800w, /p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover_hu9c8c653ca541d463556575e8448b0d08_2912832_1600x0_resize_q75_box.jpg 1600w"  width="800"
+                height="533" loading="lazy" alt="Featured image of post 使用Docker部署安装Bitwarden" />
+            
+        </a>
+    </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E9%83%A8%E7%BD%B2%E5%A4%87%E5%BF%98/" style="background-color: #2a9d8f; color: #fff;">
+                部署备忘
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/">使用Docker部署安装Bitwarden</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jun 01, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    
+    <h2 id="bitwarden密码管理器">Bitwarden密码管理器
+</h2><p>Bitwarden是一款开源跨平台的密码管理器，你可以选择自己部署密码库，而不需要经过第三方的服务器。总之为了摆脱恼人的Edge，首先要部署代替的密码管理器和迁移密码。</p>
+<h2 id="部署前的准备">部署前的准备
+</h2><ul>
+<li>一台装有<strong>docker</strong>及<strong>docker-compose</strong>，<strong>nginx</strong>的服务器</li>
+<li>一个可以使用的域名</li>
+</ul>
+<p>在这里贴上官方提供的配置要求:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th></th>
+<th>Minimum</th>
+<th>Recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Processor</td>
+<td>x64, 1.4GHz</td>
+<td>x64, 2GHz dual core</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>2GB RAM</td>
+<td>2GB RAM</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>12GB</td>
+<td>25GB</td>
+</tr>
+<tr>
+<td>Docker Version</td>
+<td>Engine 26+ and Compose</td>
+<td>Engine 26+ and Compose</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="创建一个专门用于bitwarden的用户">创建一个专门用于Bitwarden的用户
+</h2><p>根据Bitwarden官方的建议，创建一个专门用于Bitwarden的用户，以便隔绝Bitwarden与其他应用程序</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo adduser bitwarden <span class="c1"># 使用Ubantu的话，这一步就需要输入密码</span>
+</span></span><span class="line"><span class="cl">sudo passwd bitwarden <span class="c1"># 建议使用强密码并妥善保管</span>
+</span></span><span class="line"><span class="cl">sudo groupadd docker <span class="c1"># 如果安装了docker一般情况下docker用户组已经存在</span>
+</span></span><span class="line"><span class="cl">sudo usermod -aG docker bitwarden
+</span></span><span class="line"><span class="cl">sudo mkdir /opt/bitwarden
+</span></span><span class="line"><span class="cl">sudo chmod -R <span class="m">700</span> /opt/bitwarden
+</span></span><span class="line"><span class="cl">sudo chown -R bitwarden:bitwarden /opt/bitwarden
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="部署bitwarden">部署Bitwarden
+</h2><p>切换到bitwarden用户</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">su bitwarden
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>下载官方提供的安装脚本</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">curl -Lso bitwarden.sh <span class="s2">&#34;https://func.bitwarden.com/api/dl/?app=self-host&amp;platform=linux&#34;</span> <span class="o">&amp;&amp;</span> chmod <span class="m">700</span> bitwarden.sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在安装前需要先到<a class="link" href="https://bitwarden.com/host/"  target="_blank" rel="noopener"
+    >Bitwarden官网</a>获取安装id和密钥，需要用到一个邮箱地址，随后运行脚本执行安装命令，根据提示填写即可</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">./bitwarden.sh install
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>安装完成后需要修改配置文件和环境变量文件，首先修改<strong>config.yml</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">vim ./bwdata/config.yml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>主要修改以下两个设置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># Docker compose file port mapping for HTTP. Leave empty to remove the port mapping.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># Learn more: https://docs.docker.com/compose/compose-file/#ports</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">http_port</span><span class="p">:</span><span class="w"> </span><span class="m">30080</span><span class="w"> </span><span class="c"># 修改成80意外的端口防止冲突</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c">#</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># Docker compose file port mapping for HTTPS. Leave empty to remove the port mapping.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># Learn more: https://docs.docker.com/compose/compose-file/#ports</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">https_port</span><span class="p">:</span><span class="w"> </span><span class="c"># 禁用https</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>随后修改<strong>global.override.env</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">vim ./bwdata/env/global.override.env
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">globalSettings__mail__replyToEmail=no-reply@bitwarden.ratmomo.tech</span><span class="w"> </span><span class="c"># 修改成你的邮箱以获得smtp服务</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">globalSettings__mail__smtp__host=REPLACE </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">globalSettings__mail__smtp__port=587</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">globalSettings__mail__smtp__ssl=false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">globalSettings__mail__smtp__username=REPLACE</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">globalSettings__mail__smtp__password=REPLACE</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">globalSettings__disableUserRegistration=false</span><span class="w"> </span><span class="c"># 个人使用的话，在创建完账户后建议设置成true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">adminSettings__admins=</span><span class="w"> </span><span class="c"># 修改成你的邮箱</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>outlook的用户可以<a class="link" href="https://support.microsoft.com/zh-cn/office/outlook-com-%E7%9A%84-pop-imap-%E5%92%8C-smtp-%E8%AE%BE%E7%BD%AE-d088b986-291d-42b8-9564-9c414e2aa040"  target="_blank" rel="noopener"
+    >在此</a>找到相关配置</p>
+</blockquote>
+<p>修改完成后运行以下命令：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">./bitwarden.sh rebuild
+</span></span><span class="line"><span class="cl">./bitwarden.sh start
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>完成后可以使用<code>docker ps</code>验证是否正常运行</p>
+<h2 id="设置反代">设置反代
+</h2><p>个人使用强烈建议选择<strong>Nginx proxy manager</strong>代替<strong>Nginx</strong>，以下以<strong>npm</strong>为例演示：</p>
+<p>登录<strong>npm</strong>的WEB管理页面，选择<code>Add Proxy Host</code></p>
+<p><img src="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/1.png"
+	width="393"
+	height="44"
+	srcset="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/1_huf8ae256ea3097dc061ccdd3dcb8cd0a4_3264_480x0_resize_box_3.png 480w, /p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/1_huf8ae256ea3097dc061ccdd3dcb8cd0a4_3264_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="893"
+		data-flex-basis="2143px"
+	
+></p>
+<p>在<strong>Domain Names</strong>输入你的域名，例如：<code>bitwarden.example.com</code>。在<strong>Forward Hostname/IP</strong>输入服务器的IP地址，例如：<code>192.168.1.2</code>。端口填入刚刚设置的端口，建议打开下方的三个选项</p>
+<p><img src="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/2.png"
+	width="501"
+	height="549"
+	srcset="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/2_hu4beb862e9e1084efa50abcf5d3e55d3c_25721_480x0_resize_box_3.png 480w, /p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/2_hu4beb862e9e1084efa50abcf5d3e55d3c_25721_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="91"
+		data-flex-basis="219px"
+	
+></p>
+<p>点击SSL，选择<strong>Request a new SSL Certificate</strong>，建议打开<strong>Force SSl</strong>和<strong>HTTP/2 Support</strong>两个选项，再在下方填入你的邮箱，勾选同意协议以获取SSL证书</p>
+<p><img src="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/3.png"
+	width="501"
+	height="557"
+	srcset="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/3_hu55a2115b4079f9380143bc8228bc6957_30583_480x0_resize_box_3.png 480w, /p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/3_hu55a2115b4079f9380143bc8228bc6957_30583_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="89"
+		data-flex-basis="215px"
+	
+></p>
+<p>到这一步基本上已经可以通过刚刚设置的域名访问自己的BitWarden页面了,随后注册账户即可使用密码库</p>
+<h2 id="番外篇导入edgechrome密码">番外篇：导入Edge/Chrome密码
+</h2><p>在Edge/Chrome的密码管理界面选择导出</p>
+<p><img src="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/4.png"
+	width="947"
+	height="166"
+	srcset="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/4_hu2f5cd9a9b77316f0d943f8bd838f911e_27342_480x0_resize_box_3.png 480w, /p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/4_hu2f5cd9a9b77316f0d943f8bd838f911e_27342_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="570"
+		data-flex-basis="1369px"
+	
+></p>
+<p>在Bitwarden的管理页面中选择工具菜单下的导入数据，再在文件格式菜单中选择<code>Chrome(CSV)</code>，上传刚刚导出的csv文件，点击导入数据按钮即可</p>
+<p><img src="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/5.png"
+	width="1082"
+	height="757"
+	srcset="/p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/5_hu9da6740a5b43b83f25486f57682b3492_65007_480x0_resize_box_3.png 480w, /p/2024/06/01/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/5_hu9da6740a5b43b83f25486f57682b3492_65007_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="142"
+		data-flex-basis="343px"
+	
+></p>
+<h2 id="参考">参考
+</h2><blockquote>
+<p><a class="link" href="https://bitwarden.com/help/install-on-premise-linux/"  target="_blank" rel="noopener"
+    >Linux Standard Deployment | Bitwarden Help Center</a>
+<a class="link" href="https://www.horosama.com/archives/338"  target="_blank" rel="noopener"
+    >bitwarden部署和使用记录 – 萌萌哒赫萝的小站</a>
+<a class="link" href="https://blog.xollipop.top/2023/06/01/bitwarden/"  target="_blank" rel="noopener"
+    >如何搭建一个私人的bitwarden密码管理工具服务端(保姆级教程) | Sola&rsquo;s Blog</a>
+<a class="link" href="https://bitwarden.com/help/import-from-chrome/"  target="_blank" rel="noopener"
+    >Import Data from Google Chrome | Bitwarden Help Center</a></p>
+</blockquote>
+
+</section>
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+    <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/2024/06/07/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2024/06/07/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/cover.ec3d0e366e9fbf9ed83810715ae5ecd0_hu5459c0360c2b0cb7a147d2df0eb350ca_3254561_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post [All in One]在PVE中配置软路由"
+                        
+                        data-hash="md5-7D0ONm6fv57YOBBxWuXs0A==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">[All in One]在PVE中配置软路由</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2024/06/07/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2024/06/07/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.d22b0a1cde9be772d6636cc72c3aed2b_hu5459c0360c2b0cb7a147d2df0eb350ca_1084121_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post [All in One]在物理机上安装PVE"
+                        
+                        data-hash="md5-0isKHN6b53LWY2zHLDrtKw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">[All in One]在物理机上安装PVE</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/2024/06/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">
+        
+        
+            <div class="article-image">
+                <img src="/p/2024/06/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/cover.f430eed1f65133519d924af7f95ff036_huc004bd00789154600b0b30e83cc400c7_2055315_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用 Hugo &#43; Github Pages 部署个人博客"
+                        
+                        data-hash="md5-9DDu0fZRM1Gdkkr3&#43;V/wNg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用 Hugo &#43; Github Pages 部署个人博客</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="RatMomo/ratmomo.github.io"
+    data-repo-id="R_kgDOMBpFiw"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOMBpFi84Cfwtg"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="bottom"
+    data-theme="light"
+    data-lang="zh-CN"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 ratmomo&#39;s blog
+    </section>
+    
+    <section class="powerby">
+        
+            Good Morning, and in case I don't see you, good afternoon, good evening, and good night! <br/>
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

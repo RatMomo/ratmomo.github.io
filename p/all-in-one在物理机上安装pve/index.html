@@ -1,26 +1,876 @@
-<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="部署前的准备 U盘一个 PC一台，提前安装好rufus或balenaEtcher等软件用于制作启动盘 我用于搭建All in One的配置如下： 主板 B365 CPU"><title>[All in One]在物理机上安装PVE</title>
-<link rel=canonical href=https://ratmomo.github.io/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/><link rel=stylesheet href=/scss/style.min.0304c6baf04e01a8fe70693791cb744d56a3578a3120a8796cefc66825aa39c7.css><meta property='og:title' content="[All in One]在物理机上安装PVE"><meta property='og:description' content="部署前的准备 U盘一个 PC一台，提前安装好rufus或balenaEtcher等软件用于制作启动盘 我用于搭建All in One的配置如下： 主板 B365 CPU"><meta property='og:url' content='https://ratmomo.github.io/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/'><meta property='og:site_name' content="ratmomo's blog"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:published_time' content='2024-06-07T00:00:00+00:00'><meta property='article:modified_time' content='2024-06-07T00:00:00+00:00'><meta property='og:image' content='https://ratmomo.github.io/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.jpg'><meta name=twitter:title content="[All in One]在物理机上安装PVE"><meta name=twitter:description content="部署前的准备 U盘一个 PC一台，提前安装好rufus或balenaEtcher等软件用于制作启动盘 我用于搭建All in One的配置如下： 主板 B365 CPU"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://ratmomo.github.io/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.jpg'><link rel="shortcut icon" href=/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-NDQ9GXXBVM"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-NDQ9GXXBVM")}</script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
-<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_huf646c680e2e59af620b0b48da0cef2a5_1117589_300x0_resize_box_3.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>ratmomo's blog</a></h1><h2 class=site-description>朝闻道，夕死可矣</h2></div></header><ol class=menu-social><li><a href=https://github.com/RatMomo target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/archives/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-<span>Archives</span></a></li><li><a href=/search/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
-<span>Search</span></a></li><li><a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
-<span>Home</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
-<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#部署前的准备>部署前的准备</a></li><li><a href=#安装pve>安装PVE</a></li><li><a href=#连接pve>连接PVE</a></li><li><a href=#配置网卡>配置网卡</a></li><li><a href=#配置直通>配置直通</a></li><li><a href=#结尾>结尾</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover_hu5459c0360c2b0cb7a147d2df0eb350ca_1084121_800x0_resize_q75_box.jpg srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover_hu5459c0360c2b0cb7a147d2df0eb350ca_1084121_800x0_resize_q75_box.jpg 800w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover_hu5459c0360c2b0cb7a147d2df0eb350ca_1084121_1600x0_resize_q75_box.jpg 1600w" width=800 height=600 loading=lazy alt="Featured image of post [All in One]在物理机上安装PVE"></a></div><div class=article-details><header class=article-category><a href=/categories/%E9%83%A8%E7%BD%B2%E5%A4%87%E5%BF%98/ style=background-color:#2a9d8f;color:#fff>部署备忘</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/>[All in One]在物理机上安装PVE</a></h2></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
-<time class=article-time--published>Jun 07, 2024</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-<time class=article-time--reading>3 minute read</time></div></footer></div></header><section class=article-content><iframe frameborder=no border=0 marginwidth=0 marginheight=0 width=100% height=86 src="//music.163.com/outchain/player?type=2&id=29849547&auto=0&height=66"></iframe><h2 id=部署前的准备>部署前的准备</h2><ul><li>U盘一个</li><li>PC一台，提前安装好<strong>rufus</strong>或<strong>balenaEtcher</strong>等软件用于制作启动盘</li></ul><p>我用于搭建All in One的配置如下：</p><div class=table-wrapper><table><tr><td>主板</td><td>B365</td></tr><tr><td>CPU</td><td>i3-8100</td></tr><tr><td>内存</td><td>DDR4 16Gx2</td></tr><tr><td>硬盘</td><td>致钛PC005 512G</td></tr><tr><td></td><td>西数HC510</td></tr><tr><td></td><td>西数HC510</td></tr><tr><td>电源</td><td>海韵SSP-250SUB</td></tr></table></div><h2 id=安装pve>安装PVE</h2><p>从<a class=link href=https://www.proxmox.com/en/downloads target=_blank rel=noopener>PVE官网下载页面</a>下载安装镜像，这里我选择的是最新的 8.2 版本</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1.png width=1353 height=933 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1_hu28d41a32c9fe14be76f637c3cfb8e3d5_116383_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1_hu28d41a32c9fe14be76f637c3cfb8e3d5_116383_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=145 data-flex-basis=348px></p><p>将你的u盘插入PC，使用启动盘制作软件制作启动盘，这里以<strong>balenaEtcher</strong>为例：
-打开<strong>balenaEtcher</strong>，选择从<strong>文件烧录</strong>，再选择刚刚下载的镜像</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2.png width=802 height=507 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2_hu3f3e120e428ecd3e9c0ef9063bb8f29a_24180_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2_hu3f3e120e428ecd3e9c0ef9063bb8f29a_24180_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=158 data-flex-basis=379px></p><p>选择你插入的U盘</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3.png width=802 height=507 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3_huf045ea4e15598d48d2da6596faa30058_25750_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3_huf045ea4e15598d48d2da6596faa30058_25750_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=158 data-flex-basis=379px></p><p>再点击立即烧录即可，<strong>注意不要点击可能弹窗的格式化U盘</strong></p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4.png width=802 height=507 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4_hu0518109736a0561937288e6fa29bf818_17742_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4_hu0518109736a0561937288e6fa29bf818_17742_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=158 data-flex-basis=379px></p><p>将U盘从PC弹出，插入到将要安装PVE的主机，随后通过U盘引导开机（可能需要进入BIOS进行设置），这里直接回车执行第一项安装命令</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5.png width=2195 height=761 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5_hu4e453fbd289f2ee9a959a2d53eb0489b_367478_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5_hu4e453fbd289f2ee9a959a2d53eb0489b_367478_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=288 data-flex-basis=692px></p><p>在协议界面选择<strong>I aggree</strong>后，选择安装的硬盘，根据你的情况选择硬盘，这里我选择的是512G的那块固态，next</p><p>区域设置界面，在<strong>Country</strong>选项中选择<strong>China</strong>，next</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6.png width=1533 height=597 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6_hu0789b667699a5e758e84086d4a965162_304632_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6_hu0789b667699a5e758e84086d4a965162_304632_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=256 data-flex-basis=616px></p><p>密码设置界面，输入你的密码，建议设置的复杂一点，next</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7.png width=843 height=416 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7_hu167812322c42da9f67eb081623c1f772_95163_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7_hu167812322c42da9f67eb081623c1f772_95163_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=202 data-flex-basis=486px></p><p>网络设置界面，选择一个网卡作为pve的管理入口，这里我有两个网卡我选择了第一个，<strong>Hostname</strong>可以任意设置一个，<strong>IP Address</strong>如果你不想把软路由设置成主路由，就把地址设置到和你的主路由同一个网段，例如我想把软路由作为旁路由，所以将ip设置为<code>192.168.99.3</code>，<strong>Gateway</strong>则设置为主路由的地址<code>192.168.99.1</code>。如果准备将软路由作为主路由，则ip可以在局域网网段下任意设置，但注意不要设置成之后为软路由预留的地址，不过之后的教程只会介绍前一个方案。<strong>DNS Server</strong>保持默认即可，next，Install</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8.png width=1731 height=660 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8_hue22e2f90e8f48ccf9684ed9c2c4e39a7_458526_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8_hue22e2f90e8f48ccf9684ed9c2c4e39a7_458526_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=262 data-flex-basis=629px></p><h2 id=连接pve>连接PVE</h2><p>点击reboot，关机完成重启前拔出启动盘，让机器通过硬盘引导，随后直接将PC的网口连接到All in One主机刚刚选择作为管理口的网口，以防错误我们主动将PC和主机设置同一网段，如果是<strong>Windows 11</strong>的话，打开<strong>设置 - 网络和Internet - 高级网络设置 - 以太网（注意是你PC的网卡对应的以太网）- Internet 协议版本 4（TCP/IPv4）- 属性</strong>，将PC的ip地址设置成同一个网段，这里用的是<code>192.168.99.99</code>，子网掩码保持默认，默认网关设置成为软路由预设的网关，点击确定即可</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9.png width=1319 height=693 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9_hu7f9402435d5955ed17297bd656233a67_149980_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9_hu7f9402435d5955ed17297bd656233a67_149980_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=190 data-flex-basis=456px></p><p>随后打开PC的浏览器，输入<code>192.168.99.3:8006</code>，如果提示不是私密连接则点高级再点击继续前往</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10.png width=639 height=547 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10_hu639a1d41bd821cc0fbeee33c3352dc91_56452_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10_hu639a1d41bd821cc0fbeee33c3352dc91_56452_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=116 data-flex-basis=280px></p><p>打开PVE管理页面后，在<strong>用户名</strong>输入root，密码即为安装时设置的密码，最后一个选项可以设置语言</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11.png width=400 height=196 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11_hu0cea37fc23deb949abe4d66153b799b6_12064_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11_hu0cea37fc23deb949abe4d66153b799b6_12064_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=204 data-flex-basis=489px></p><h2 id=配置网卡>配置网卡</h2><p>作为旁路由的软路由其实只需要一个网口，但是既然我们有两个网卡也不能浪费。在PVE中点击你的宿主机，选择<strong>系统 - 网络</strong>。可以看到其中一个网卡PVE已经自动为我们完成了桥接</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12.png width=656 height=71 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12_hu6125e3d56b4631aa3cccccc0e88434be_7155_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12_hu6125e3d56b4631aa3cccccc0e88434be_7155_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=923 data-flex-basis=2217px></p><p>点击<strong>创建 - Linux Bridge</strong>，在桥接端口中输入第二个网卡的名称，点击创建</p><p><img src=/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13.png width=600 height=250 srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13_hue37e230f51cf6d777e5271b330206d5a_17776_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13_hue37e230f51cf6d777e5271b330206d5a_17776_1024x0_resize_box_3.png 1024w" loading=lazy alt="alt text" class=gallery-image data-flex-grow=240 data-flex-basis=576px></p><h2 id=配置直通>配置直通</h2><p>需要提前主板bios中开启虚拟化功能，不同的平台设置不同。开启虚拟化后，点击宿主机的Shell功能，修改<strong>grub</strong>配置</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
-</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vim /etc/default/grub <span class=c1># 没有Vim则apt安装，或者使用vi</span>
-</span></span></code></pre></td></tr></table></div></div><p>将<code>GRUB_CMDLINE_LINUX_DEFAULT</code>项修改为</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
-</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>GRUB_CMDLINE_LINUX_DEFAULT=&#34;quiet intel_iommu=on iommu=pt&#34;
-</span></span></code></pre></td></tr></table></div></div><p>修改完成后更新<strong>grup</strong>，并重启</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>update-grub
-</span></span><span class=line><span class=cl>reboot
-</span></span></code></pre></td></tr></table></div></div><h2 id=结尾>结尾</h2><p>至此，PVE已经可以正常使用了，关于换源等PVE优化并非必要，网上有很多其他教程可以参考</p></section><footer class=article-footer><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
-<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/><div class=article-image><img src=/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/cover.f430eed1f65133519d924af7f95ff036_huc004bd00789154600b0b30e83cc400c7_2055315_250x150_fill_q75_box_smart1.jpg width=250 height=150 loading=lazy alt="Featured image of post 使用 Hugo + Github Pages 部署个人博客" data-hash="md5-9DDu0fZRM1Gdkkr3+V/wNg=="></div><div class=article-details><h2 class=article-title>使用 Hugo + Github Pages 部署个人博客</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=RatMomo/ratmomo.github.io data-repo-id=R_kgDOMBpFiw data-category=Announcements data-category-id=DIC_kwDOMBpFi84Cfwtg data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=bottom data-theme=light data-lang=zh-CN crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class=site-footer><section class=copyright>&copy;
-2024 ratmomo's blog</section><section class=powerby>Good Morning, and in case I don't see you, good afternoon, good evening, and good night!<br>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.26.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-<button class="pswp__button pswp__button--share" title=Share></button>
-<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-</button>
-<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=7120&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="部署前的准备 U盘一个 PC一台，提前安装好rufus或balenaEtcher等软件用于制作启动盘 我用于搭建All in One的配置如下： 主板 B365 CPU">
+<title>[All in One]在物理机上安装PVE</title>
+
+<link rel='canonical' href='http://localhost:7120/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/'>
+
+<link rel="stylesheet" href="/scss/style.min.e8c7fca7d1c9294aa7a4f3426c225ee26540f7d94e39be0b5a4a5c8a49ca5a25.css"><meta property='og:title' content="[All in One]在物理机上安装PVE">
+<meta property='og:description' content="部署前的准备 U盘一个 PC一台，提前安装好rufus或balenaEtcher等软件用于制作启动盘 我用于搭建All in One的配置如下： 主板 B365 CPU">
+<meta property='og:url' content='http://localhost:7120/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/'>
+<meta property='og:site_name' content='ratmomo&#39;s blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-06-07T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-06-07T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:7120/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.jpg' />
+<meta name="twitter:title" content="[All in One]在物理机上安装PVE">
+<meta name="twitter:description" content="部署前的准备 U盘一个 PC一台，提前安装好rufus或balenaEtcher等软件用于制作启动盘 我用于搭建All in One的配置如下： 主板 B365 CPU"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='http://localhost:7120/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+  
+    
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-NDQ9GXXBVM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-NDQ9GXXBVM');
+        }
+      </script>
+    
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huf646c680e2e59af620b0b48da0cef2a5_1117589_300x0_resize_box_3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">ratmomo&#39;s blog</a></h1>
+            <h2 class="site-description">朝闻道，夕死可矣</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/RatMomo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#部署前的准备">部署前的准备</a></li>
+    <li><a href="#安装pve">安装PVE</a></li>
+    <li><a href="#连接pve">连接PVE</a></li>
+    <li><a href="#配置网卡">配置网卡</a></li>
+    <li><a href="#配置直通">配置直通</a></li>
+    <li><a href="#结尾">结尾</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+    <div class="article-image">
+        <a href="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/">
+            <img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover_hu5459c0360c2b0cb7a147d2df0eb350ca_1084121_800x0_resize_q75_box.jpg" srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover_hu5459c0360c2b0cb7a147d2df0eb350ca_1084121_800x0_resize_q75_box.jpg 800w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover_hu5459c0360c2b0cb7a147d2df0eb350ca_1084121_1600x0_resize_q75_box.jpg 1600w"  width="800"
+                height="600" loading="lazy" alt="Featured image of post [All in One]在物理机上安装PVE" />
+            
+        </a>
+    </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E9%83%A8%E7%BD%B2%E5%A4%87%E5%BF%98/" style="background-color: #2a9d8f; color: #fff;">
+                部署备忘
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/">[All in One]在物理机上安装PVE</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jun 07, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=86
+    src="//music.163.com/outchain/player?type=2&id=29849547&auto=0&height=66">
+</iframe>
+    
+    <h2 id="部署前的准备">部署前的准备
+</h2><ul>
+<li>U盘一个</li>
+<li>PC一台，提前安装好<strong>rufus</strong>或<strong>balenaEtcher</strong>等软件用于制作启动盘</li>
+</ul>
+<p>我用于搭建All in One的配置如下：</p>
+<div class="table-wrapper"><table>
+    <tr>
+        <td>主板</td>
+        <td>B365</td>
+    </tr>
+    <tr>
+        <td>CPU</td>
+        <td>i3-8100</td>
+    </tr>
+    <tr>
+        <td>内存</td>
+        <td>DDR4 16Gx2</td>
+    </tr>
+    <tr>
+        <td>硬盘</td>
+        <td>致钛PC005 512G</td>
+    </tr>
+    <tr>
+        <td> </td>
+        <td>西数HC510</td>
+    </tr>
+    <tr>
+        <td> </td>
+        <td>西数HC510</td>
+    </tr>
+    <tr>
+        <td>电源</td>
+        <td>海韵SSP-250SUB</td>
+    </tr>
+</table></div>
+<h2 id="安装pve">安装PVE
+</h2><p>从<a class="link" href="https://www.proxmox.com/en/downloads"  target="_blank" rel="noopener"
+    >PVE官网下载页面</a>下载安装镜像，这里我选择的是最新的 8.2 版本</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1.png"
+	width="1353"
+	height="933"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1_hu28d41a32c9fe14be76f637c3cfb8e3d5_116383_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1_hu28d41a32c9fe14be76f637c3cfb8e3d5_116383_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="145"
+		data-flex-basis="348px"
+	
+></p>
+<p>将你的u盘插入PC，使用启动盘制作软件制作启动盘，这里以<strong>balenaEtcher</strong>为例：
+打开<strong>balenaEtcher</strong>，选择从<strong>文件烧录</strong>，再选择刚刚下载的镜像</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2.png"
+	width="802"
+	height="507"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2_hu3f3e120e428ecd3e9c0ef9063bb8f29a_24180_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2_hu3f3e120e428ecd3e9c0ef9063bb8f29a_24180_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="158"
+		data-flex-basis="379px"
+	
+></p>
+<p>选择你插入的U盘</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3.png"
+	width="802"
+	height="507"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3_huf045ea4e15598d48d2da6596faa30058_25750_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3_huf045ea4e15598d48d2da6596faa30058_25750_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="158"
+		data-flex-basis="379px"
+	
+></p>
+<p>再点击立即烧录即可，<strong>注意不要点击可能弹窗的格式化U盘</strong></p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4.png"
+	width="802"
+	height="507"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4_hu0518109736a0561937288e6fa29bf818_17742_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4_hu0518109736a0561937288e6fa29bf818_17742_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="158"
+		data-flex-basis="379px"
+	
+></p>
+<p>将U盘从PC弹出，插入到将要安装PVE的主机，随后通过U盘引导开机（可能需要进入BIOS进行设置），这里直接回车执行第一项安装命令</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5.png"
+	width="2195"
+	height="761"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5_hu4e453fbd289f2ee9a959a2d53eb0489b_367478_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5_hu4e453fbd289f2ee9a959a2d53eb0489b_367478_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="288"
+		data-flex-basis="692px"
+	
+></p>
+<p>在协议界面选择<strong>I aggree</strong>后，选择安装的硬盘，根据你的情况选择硬盘，这里我选择的是512G的那块固态，next</p>
+<p>区域设置界面，在<strong>Country</strong>选项中选择<strong>China</strong>，next</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6.png"
+	width="1533"
+	height="597"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6_hu0789b667699a5e758e84086d4a965162_304632_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6_hu0789b667699a5e758e84086d4a965162_304632_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="256"
+		data-flex-basis="616px"
+	
+></p>
+<p>密码设置界面，输入你的密码，建议设置的复杂一点，next</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7.png"
+	width="843"
+	height="416"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7_hu167812322c42da9f67eb081623c1f772_95163_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7_hu167812322c42da9f67eb081623c1f772_95163_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="202"
+		data-flex-basis="486px"
+	
+></p>
+<p>网络设置界面，选择一个网卡作为pve的管理入口，这里我有两个网卡我选择了第一个，<strong>Hostname</strong>可以任意设置一个，<strong>IP Address</strong>如果你不想把软路由设置成主路由，就把地址设置到和你的主路由同一个网段，例如我想把软路由作为旁路由，所以将ip设置为<code>192.168.99.3</code>，<strong>Gateway</strong>则设置为主路由的地址<code>192.168.99.1</code>。如果准备将软路由作为主路由，则ip可以在局域网网段下任意设置，但注意不要设置成之后为软路由预留的地址，不过之后的教程只会介绍前一个方案。<strong>DNS Server</strong>保持默认即可，next，Install</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8.png"
+	width="1731"
+	height="660"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8_hue22e2f90e8f48ccf9684ed9c2c4e39a7_458526_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8_hue22e2f90e8f48ccf9684ed9c2c4e39a7_458526_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="262"
+		data-flex-basis="629px"
+	
+></p>
+<h2 id="连接pve">连接PVE
+</h2><p>点击reboot，关机完成重启前拔出启动盘，让机器通过硬盘引导，随后直接将PC的网口连接到All in One主机刚刚选择作为管理口的网口，以防错误我们主动将PC和主机设置同一网段，如果是<strong>Windows 11</strong>的话，打开<strong>设置 - 网络和Internet - 高级网络设置 - 以太网（注意是你PC的网卡对应的以太网）- Internet 协议版本 4（TCP/IPv4）- 属性</strong>，将PC的ip地址设置成同一个网段，这里用的是<code>192.168.99.99</code>，子网掩码保持默认，默认网关设置成为软路由预设的网关，点击确定即可</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9.png"
+	width="1319"
+	height="693"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9_hu7f9402435d5955ed17297bd656233a67_149980_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9_hu7f9402435d5955ed17297bd656233a67_149980_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="190"
+		data-flex-basis="456px"
+	
+></p>
+<p>随后打开PC的浏览器，输入<code>192.168.99.3:8006</code>，如果提示不是私密连接则点高级再点击继续前往</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10.png"
+	width="639"
+	height="547"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10_hu639a1d41bd821cc0fbeee33c3352dc91_56452_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10_hu639a1d41bd821cc0fbeee33c3352dc91_56452_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="116"
+		data-flex-basis="280px"
+	
+></p>
+<p>打开PVE管理页面后，在<strong>用户名</strong>输入root，密码即为安装时设置的密码，最后一个选项可以设置语言</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11.png"
+	width="400"
+	height="196"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11_hu0cea37fc23deb949abe4d66153b799b6_12064_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11_hu0cea37fc23deb949abe4d66153b799b6_12064_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="204"
+		data-flex-basis="489px"
+	
+></p>
+<h2 id="配置网卡">配置网卡
+</h2><p>作为旁路由的软路由其实只需要一个网口，但是既然我们有两个网卡也不能浪费。在PVE中点击你的宿主机，选择<strong>系统 - 网络</strong>。可以看到其中一个网卡PVE已经自动为我们完成了桥接</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12.png"
+	width="656"
+	height="71"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12_hu6125e3d56b4631aa3cccccc0e88434be_7155_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12_hu6125e3d56b4631aa3cccccc0e88434be_7155_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="923"
+		data-flex-basis="2217px"
+	
+></p>
+<p>点击<strong>创建 - Linux Bridge</strong>，在桥接端口中输入第二个网卡的名称，点击创建</p>
+<p><img src="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13.png"
+	width="600"
+	height="250"
+	srcset="/p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13_hue37e230f51cf6d777e5271b330206d5a_17776_480x0_resize_box_3.png 480w, /p/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13_hue37e230f51cf6d777e5271b330206d5a_17776_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="240"
+		data-flex-basis="576px"
+	
+></p>
+<h2 id="配置直通">配置直通
+</h2><p>需要提前主板bios中开启虚拟化功能，不同的平台设置不同。开启虚拟化后，点击宿主机的Shell功能，修改<strong>grub</strong>配置</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">vim /etc/default/grub <span class="c1"># 没有Vim则apt安装，或者使用vi</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>将<code>GRUB_CMDLINE_LINUX_DEFAULT</code>项修改为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">GRUB_CMDLINE_LINUX_DEFAULT=&#34;quiet intel_iommu=on iommu=pt&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>修改完成后更新<strong>grup</strong>，并重启</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">update-grub
+</span></span><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="结尾">结尾
+</h2><p>至此，PVE已经可以正常使用了，关于换源等PVE优化并非必要，网上有很多其他教程可以参考</p>
+
+</section>
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+    <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/">
+        
+        
+            <div class="article-image">
+                <img src="/p/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/_hu5459c0360c2b0cb7a147d2df0eb350ca_3254561_641169fdd5461d8b5606a5bfb0cd8ed0.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post [All in One]在PVE中配置软路由"
+                        
+                        data-hash="md5-7D0ONm6fv57YOBBxWuXs0A==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">[All in One]在PVE中配置软路由</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/cover.f430eed1f65133519d924af7f95ff036_huc004bd00789154600b0b30e83cc400c7_2055315_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用 Hugo &#43; Github Pages 部署个人博客"
+                        
+                        data-hash="md5-9DDu0fZRM1Gdkkr3&#43;V/wNg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用 Hugo &#43; Github Pages 部署个人博客</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover.01bfd83311051002de55d58cfe13fe71_hu9c8c653ca541d463556575e8448b0d08_2912832_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用Docker部署安装Bitwarden"
+                        
+                        data-hash="md5-Ab/YMxEFEALeVdWM/hP&#43;cQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用Docker部署安装Bitwarden</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="RatMomo/ratmomo.github.io"
+    data-repo-id="R_kgDOMBpFiw"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOMBpFi84Cfwtg"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="bottom"
+    data-theme="light"
+    data-lang="zh-CN"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 ratmomo&#39;s blog
+    </section>
+    
+    <section class="powerby">
+        
+            Good Morning, and in case I don't see you, good afternoon, good evening, and good night! <br/>
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
