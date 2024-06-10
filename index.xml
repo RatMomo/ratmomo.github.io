@@ -1,4 +1,261 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ratmomo's blog</title><link>https://ratmomo.github.io/</link><description>Recent content on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 07 Jun 2024 20:26:41 +0800</lastBuildDate><atom:link href="https://ratmomo.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>[All in One]在物理机上安装PVE</title><link>https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/</link><pubDate>Fri, 07 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.jpg" alt="Featured image of post [All in One]在物理机上安装PVE" />&lt;h2 id="部署前的准备">部署前的准备
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ratmomo's blog</title><link>https://ratmomo.github.io/</link><description>Recent content on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 10 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://ratmomo.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>[All in One]在PVE中配置软路由</title><link>https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/</link><pubDate>Mon, 10 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/cover.jpg" alt="Featured image of post [All in One]在PVE中配置软路由" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>为了摆脱PC用网线直连主机来操作pve的窘境，我们在PVE中首当其冲应该安装的部分就是软路由，主流的软路由有&lt;strong>iKuai&lt;/strong>和&lt;strong>OpenWrt&lt;/strong>等，&lt;strong>OpenWrt&lt;/strong>又有着许多的发行版，这里我们用&lt;strong>iStoreOS&lt;/strong>为例，在PVE中安装软路由&lt;/p>
+&lt;h2 id="部署前的准备">部署前的准备
+&lt;/h2>&lt;ul>
+&lt;li>一台成功安装PVE的主机，可以参考&lt;a class="link" href="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/" >这篇文章&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="为软路由准备虚拟机">为软路由准备虚拟机
+&lt;/h2>&lt;p>在PVE管理页面的右上角选择创建虚拟机，&lt;strong>名称&lt;/strong>任意,&lt;strong>VM ID&lt;/strong>可以修改但不能冲突，这里使用默认，下一步&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1_hu699122af892996bf585443cfa25ea0d5_24555_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1_hu699122af892996bf585443cfa25ea0d5_24555_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>软路由的安装比较特殊，这里选择不使用任何介质&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2_hu0cee02120b2c9a165f3c3e4238f2cb7e_33423_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2_hu0cee02120b2c9a165f3c3e4238f2cb7e_33423_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>由于没有使用UEFI的固件，这里保持默认，下一步&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3_huc1b9a9237f58ee84ea8b7616cb468d71_30151_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3_huc1b9a9237f58ee84ea8b7616cb468d71_30151_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>不需要创建磁盘，直接点击删除，下一步&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4_hufef3690b0996a6d2c0159a25a06c69c0_35732_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4_hufef3690b0996a6d2c0159a25a06c69c0_35732_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>&lt;strong>核心数&lt;/strong>和&lt;strong>插槽&lt;/strong>根据你的平台决定，软路由性能需求不高，可以保持默认，或者也可以设置到与你的平台情况一致，PVE会动态分配资源，无需担心类别可以保持默认，也可以选择host（据说性能更好）&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6_hu3914c277acb1998541c6a22203b3a8cd_24143_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6_hu3914c277acb1998541c6a22203b3a8cd_24143_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>内存分配随意，这里保持默认&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7_hu7239a720725eef863bd773375ab261db_22399_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7_hu7239a720725eef863bd773375ab261db_22399_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>网络保持默认即可，模型使用&lt;strong>半虚拟化&lt;/strong>据说性能更佳，但可能不兼容某些老设备&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8_hu6e6becf96bcf73f7ffa542d234481912_29296_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8_hu6e6becf96bcf73f7ffa542d234481912_29296_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;h2 id="安装istoreos固件">安装iStoreOS固件
+&lt;/h2>&lt;p>在&lt;a class="link" href="https://fw.koolcenter.com/iStoreOS/" target="_blank" rel="noopener"
+>KoolCenter 固件下载服务器&lt;/a>中下载自己平台对应的固件，由于我们使用的是PVE虚拟机，这里就下载x86_64的固件，下载完成后解压&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image.png"
+width="1109"
+height="36"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image_hu4a8d5d1f12812648351b126efcc89737_5217_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image_hu4a8d5d1f12812648351b126efcc89737_5217_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="3080"
+data-flex-basis="7393px"
+>&lt;/p>
+&lt;p>依次点击&lt;strong>local - ISO镜像 - 上传&lt;/strong>，将iStoreOS的镜像上传，注意复制一下你的文件名，等会需要使用&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10.png"
+width="404"
+height="269"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10_hu08db59084c4d17231a679b56bc895b39_12745_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10_hu08db59084c4d17231a679b56bc895b39_12745_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>&lt;/p>
+&lt;p>选择宿主机的Shell功能，执行命令，这里的iso文件名是你即刚刚上传时的文件名&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qm importdisk &lt;span class="m">100&lt;/span> /var/lib/vz/template/iso/istoreos-22.03.6-2024051012-x86-64-squashfs-combined.img local-lvm
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>选择软路由虚拟机，选择&lt;strong>硬件&lt;/strong>，双击未使用的磁盘，点击添加，可以扩容一下磁盘，但不是必要的&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9.png"
+width="676"
+height="278"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9_hu5a404f922a2e3126f7e4a90626847515_36293_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9_hu5a404f922a2e3126f7e4a90626847515_36293_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="243"
+data-flex-basis="583px"
+>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11.png"
+width="600"
+height="218"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11_hue4a06a61a7dd2d9d30ff3568b797b311_19618_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11_hue4a06a61a7dd2d9d30ff3568b797b311_19618_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="275"
+data-flex-basis="660px"
+>&lt;/p>
+&lt;p>注意到这里已经有了第一个网卡，点击左上角的&lt;strong>添加 - 网络设备&lt;/strong>，将我们桥接的第二个网卡添加进去&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14.png"
+width="600"
+height="182"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14_hueabe0a70c57042b5451df8da4cf7c04d_20347_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14_hueabe0a70c57042b5451df8da4cf7c04d_20347_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="329"
+data-flex-basis="791px"
+>&lt;/p>
+&lt;p>选择软路由虚拟机，选择&lt;strong>选项 - 引导顺序 -编辑&lt;/strong>，将刚刚添加的磁盘启动，并拖到最上方&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12.png"
+width="1307"
+height="727"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12_hu40741c1752d19b6b64e5824f2541c7a6_98116_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12_hu40741c1752d19b6b64e5824f2541c7a6_98116_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13.png"
+width="640"
+height="267"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13_hu538f830d61e66881cd00ada61bd9a519_19478_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13_hu538f830d61e66881cd00ada61bd9a519_19478_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="239"
+data-flex-basis="575px"
+>&lt;/p>
+&lt;h2 id="配置istoreos作为旁路由">配置iStoreOS作为旁路由
+&lt;/h2>&lt;p>此时启动软路由虚拟机，点击控制台，等待引导结束，系统启动&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15.png"
+width="2250"
+height="1037"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15_hubb8fd10a056ea98441e24069ad03a1c1_420930_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15_hubb8fd10a056ea98441e24069ad03a1c1_420930_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="216"
+data-flex-basis="520px"
+>&lt;/p>
+&lt;p>按下回车键，进入命令行，输入命令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">quickstart
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用上下键选择选项&lt;strong>2&lt;/strong>
+&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16.png"
+width="390"
+height="159"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16_hu8e60265e5638429e2ce929bcae0d7be8_43134_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16_hu8e60265e5638429e2ce929bcae0d7be8_43134_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="588px"
+>&lt;/p>
+&lt;p>这里输入之前为虚拟机预留的ip，我这里是&lt;code>192.168.99.2&lt;/code>，子网掩码输入&lt;code>255.255.255.0&lt;/code>，使用上下键选择&lt;code>quit&lt;/code>离开，重启虚拟机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17.png"
+width="623"
+height="42"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17_hu90c1e1d2a38a8a954073b1123b14c787_9012_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17_hu90c1e1d2a38a8a954073b1123b14c787_9012_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1483"
+data-flex-basis="3560px"
+>&lt;/p>
+&lt;p>此时便可以在浏览器中输入&lt;code>192.168.99.2&lt;/code>进入iStoreOS的管理界面，默认的密码是&lt;code>password&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18.png"
+width="420"
+height="486"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18_hubfed1aa8e475298edb060dc40795db4d_146850_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18_hubfed1aa8e475298edb060dc40795db4d_146850_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="207px"
+>&lt;/p>
+&lt;p>虽然出现危险的可能性不大，但还是建议现在&lt;strong>系统 - 管理权 - 路由器密码&lt;/strong>处先修改密码&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19.png"
+width="1123"
+height="488"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19_hu225cfc792244915e1e580a7eefcf385a_52990_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19_hu225cfc792244915e1e580a7eefcf385a_52990_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="230"
+data-flex-basis="552px"
+>&lt;/p>
+&lt;p>点击&lt;strong>网络 - 接口 - 设备 - br-lan的配置&lt;/strong>，在网桥端口项将所有的网卡加入桥接&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-26.png"
+width="2538"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-26_hu6240ee3276a24ad16fefec8a02a1255e_116591_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-26_hu6240ee3276a24ad16fefec8a02a1255e_116591_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="470"
+data-flex-basis="1128px"
+>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-27.png"
+width="837"
+height="398"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-27_hu212228adfcf97d8b9fd3faa3b9e9d046_43075_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-27_hu212228adfcf97d8b9fd3faa3b9e9d046_43075_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="210"
+data-flex-basis="504px"
+>&lt;/p>
+&lt;p>因为我将软路由作为旁路由且不负责dhcp，所以不需要再添加接口，点击&lt;strong>网络向导&lt;/strong>，选择&lt;strong>配置为旁路由&lt;/strong>，在&lt;strong>手动配置&lt;/strong>中输入为&lt;code>192.168.99.2&lt;/code>，网关为主路由地址，关闭&lt;strong>DHCPv4服务&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20.png"
+width="600"
+height="886"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20_hueacf499a7a3140355ee3c5a391a7c974_59539_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20_hueacf499a7a3140355ee3c5a391a7c974_59539_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="67"
+data-flex-basis="162px"
+>&lt;/p>
+&lt;p>点击&lt;strong>网络 - 接口 - lan - 编辑 - DHCP服务器 - 常规设置&lt;/strong>，选择&lt;strong>忽略此接口&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21.png"
+width="2428"
+height="784"
+srcset="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21_hu7006440cdcf4cbbb1d31cdd8b46afff1_119439_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21_hu7006440cdcf4cbbb1d31cdd8b46afff1_119439_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="309"
+data-flex-basis="743px"
+>&lt;/p>
+&lt;p>此时拔掉PC与软路由相连的网线，将作为主机的一个网口与主路由器的lan口连接，软路由能正常联网即表明配置成功，PC上的以太网设置也可以还原了&lt;/p>
+&lt;h2 id="结尾">结尾
+&lt;/h2>&lt;p>软路由的设置到这里就结束了&lt;/p></description></item><item><title>[All in One]在物理机上安装PVE</title><link>https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/</link><pubDate>Fri, 07 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/all-in-one%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.jpg" alt="Featured image of post [All in One]在物理机上安装PVE" />&lt;h2 id="部署前的准备">部署前的准备
 &lt;/h2>&lt;ul>
 &lt;li>U盘一个&lt;/li>
 &lt;li>PC一台，提前安装好&lt;strong>rufus&lt;/strong>或&lt;strong>balenaEtcher&lt;/strong>等软件用于制作启动盘&lt;/li>
@@ -178,7 +435,7 @@ data-flex-basis="576px"
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
 &lt;/span>&lt;/code>&lt;/pre>&lt;/td>
 &lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vim /etc/default/grub &lt;span class="c1"># 没有Vim则apt安装，或者使用vi&lt;/span>
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vim /etc/default/grub &lt;span class="c1"># 没有vim则apt安装，或者使用vi&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;p>将&lt;code>GRUB_CMDLINE_LINUX_DEFAULT&lt;/code>项修改为&lt;/p>
