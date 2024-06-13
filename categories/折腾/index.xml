@@ -1,0 +1,1211 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>折腾 on ratmomo's blog</title><link>https://ratmomo.github.io/categories/%E6%8A%98%E8%85%BE/</link><description>Recent content in 折腾 on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 13 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://ratmomo.github.io/categories/%E6%8A%98%E8%85%BE/index.xml" rel="self" type="application/rss+xml"/><item><title>使用Clonezilla将PVE虚拟机迁移到物理机</title><link>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</link><pubDate>Thu, 13 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cover.jpg" alt="Featured image of post 使用Clonezilla将PVE虚拟机迁移到物理机" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>厌烦了虚拟机的性能损失和不稳定，思来想去整了个n1盒子作旁路由，决定把PVE中的虚拟机迁移到物理机上。找了一圈方案貌似Clonezilla最简单安全，所以决定试试。&lt;/p>
+&lt;blockquote>
+&lt;p>以下操作有危险，请保存好你的数据！！！&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="制作clonezilla启动盘">制作Clonezilla启动盘
+&lt;/h2>&lt;p>从&lt;a class="link" href="https://clonezilla.org/downloads.php" target="_blank" rel="noopener"
+>这里&lt;/a>下载Clonezilla的镜像文件，注意选择iso镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image.png"
+width="850"
+height="254"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image_hu3ef6e36e8cdd8b758ad7784b3d44e4bd_26514_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image_hu3ef6e36e8cdd8b758ad7784b3d44e4bd_26514_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="334"
+data-flex-basis="803px"
+>&lt;/p>
+&lt;p>使用烧录软件将U盘制作成启动盘，这里以&lt;strong>balenaEtcher&lt;/strong>为例，使用&lt;strong>Fusion&lt;/strong>等等也是可以的（注意烧录完成后如果弹出格式化硬盘，务必取消）&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-1.png"
+width="802"
+height="507"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-1_hud46ad1698bfffe367db0cd2f602fa344_22222_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-1_hud46ad1698bfffe367db0cd2f602fa344_22222_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;h2 id="备份系统">备份系统
+&lt;/h2>&lt;p>将u盘插入装有PVE虚拟机的主机上，登录PVE管理界面，点击&lt;strong>需要备份的虚拟机 - 硬件 - 添加 - USB设备&lt;/strong>，将刚刚插上的硬盘直通给虚拟机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-2.png"
+width="1430"
+height="804"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-2_hu84b2f55f0e5b363bac0c08b68babeed9_101282_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-2_hu84b2f55f0e5b363bac0c08b68babeed9_101282_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;p>点击&lt;strong>选项 - 引导顺序&lt;/strong>，将刚刚直通的usb启动，并拖到第一位，重启虚拟机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-3.png"
+width="1329"
+height="819"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-3_huf65cab0f4aa5ae52a627267bb914990e_99042_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-3_huf65cab0f4aa5ae52a627267bb914990e_99042_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="389px"
+>&lt;/p>
+&lt;p>进入Clonezilla后，使用上下键选择语言&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-4.png"
+width="1320"
+height="990"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-4_huf723d8fc8c47e8436491d15f6fd0fd47_131433_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-4_huf723d8fc8c47e8436491d15f6fd0fd47_131433_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>键盘配置保持默认&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-5.png"
+width="1320"
+height="990"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-5_hub4e14903614b3d84033ddfaa97f95339_66802_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-5_hub4e14903614b3d84033ddfaa97f95339_66802_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择使用再生龙&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-6.png"
+width="1320"
+height="990"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-6_hua1d94ee5d1611785be4d3527fca89e99_70563_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-6_hua1d94ee5d1611785be4d3527fca89e99_70563_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择第一项，保存到镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-7.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-7_hu923c49ea93f1e40ab1d4e648ad9b28b8_208000_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-7_hu923c49ea93f1e40ab1d4e648ad9b28b8_208000_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>我要把镜像保存到主机的机械硬盘中，所以直接选第一项，如果有别的需求可以按需选择（前提是已经将硬盘直通给虚拟机）&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-8.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-8_hu810d88f93f19d90c5a97155197b64f9f_176978_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-8_hu810d88f93f19d90c5a97155197b64f9f_176978_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>检查要储存备份的硬盘是否有正常显示，若正常使用&lt;code>Ctrl+C&lt;/code>退出此页面&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-9.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-9_hu99ea401d73ab9a5633aab87d9425d277_132431_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-9_hu99ea401d73ab9a5633aab87d9425d277_132431_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择要储存备份的硬盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-10.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-10_hu7c93139d6ebed1193a786cf05e7da7c7_226982_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-10_hu7c93139d6ebed1193a786cf05e7da7c7_226982_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择跳过检查&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-11.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-11_hu75524a657c21551f44fa9aee7500a9dd_145736_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-11_hu75524a657c21551f44fa9aee7500a9dd_145736_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择完目录后，点击选择&lt;code>Done&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-12.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-12_hu8c144fbe0dc7fada13a8bea1bd316b7c_145329_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-12_hu8c144fbe0dc7fada13a8bea1bd316b7c_145329_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择第一项&lt;code>初学模式&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-13.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-13_hue0569a1e9f5d514a58ffca1f855216a1_98257_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-13_hue0569a1e9f5d514a58ffca1f855216a1_98257_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择&lt;code>储存本机硬盘为镜像文件&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-14.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-14_hu88b2c62f90d337ad100e0e95b831edda_148672_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-14_hu88b2c62f90d337ad100e0e95b831edda_148672_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>输入镜像名称，默认即可&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-15.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-15_hu43fa6f0c8ed83cce4ed1cf44ff1b16b8_102981_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-15_hu43fa6f0c8ed83cce4ed1cf44ff1b16b8_102981_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择要备份的硬盘，一般sda是系统盘，按空格键选择&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-16.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-16_hu7667f2817f7a00923a66f3a2f08745f5_138500_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-16_hu7667f2817f7a00923a66f3a2f08745f5_138500_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择压缩方式，默认的第二项即可&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-17.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-17_hu88a4feb906a68fe82379cdc0791c043b_108785_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-17_hu88a4feb906a68fe82379cdc0791c043b_108785_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>跳过检查&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-18.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-18_hu1b09f2f90cae0e1f8bdb543e9e18e1f6_140262_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-18_hu1b09f2f90cae0e1f8bdb543e9e18e1f6_140262_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>跳过检查&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-19.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-19_huf91675b27c0a2ab56454036e91741ad0_110757_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-19_huf91675b27c0a2ab56454036e91741ad0_110757_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择不加密，当操作完成后选择关机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-20.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-20_hu560f5b0791ccd1b316823ecc1868c3aa_88956_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-20_hu560f5b0791ccd1b316823ecc1868c3aa_88956_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;h2 id="恢复系统">恢复系统
+&lt;/h2>&lt;p>重启主机，进入Bios，将U盘设为引导顺序的第一位&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e223e37b64295f25d4fb9f0c587c0bd.jpg"
+width="2306"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e223e37b64295f25d4fb9f0c587c0bd_hu9bea9fb22eaed8138a5cca0fa29ea2a1_866452_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e223e37b64295f25d4fb9f0c587c0bd_hu9bea9fb22eaed8138a5cca0fa29ea2a1_866452_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="432px"
+>&lt;/p>
+&lt;p>进入Clonezilla，前面的选项照旧，这里的硬盘选择之前存储镜像的硬盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/ab437103f8e8ecba274ecd9c96f9860.jpg"
+width="3138"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/ab437103f8e8ecba274ecd9c96f9860_hu8f1f359a4f572c7af9c4c49fdaacbb95_1103748_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/ab437103f8e8ecba274ecd9c96f9860_hu8f1f359a4f572c7af9c4c49fdaacbb95_1103748_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="588px"
+>&lt;/p>
+&lt;p>目录选择之前存储镜像的目录&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4b6b372656b268eafc7d6b501d62468.jpg"
+width="2297"
+height="1279"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4b6b372656b268eafc7d6b501d62468_hu1464fe2373a97ca62cfc5ad5df644bef_502784_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4b6b372656b268eafc7d6b501d62468_hu1464fe2373a97ca62cfc5ad5df644bef_502784_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>选择初学模式&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cea8e115bb70a45be31210fc5614912.jpg"
+width="2305"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cea8e115bb70a45be31210fc5614912_hu1284ee02582a90eec8c5dc277c47e28a_282194_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cea8e115bb70a45be31210fc5614912_hu1284ee02582a90eec8c5dc277c47e28a_282194_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="432px"
+>&lt;/p>
+&lt;p>选择&lt;code>还原镜像文件到本机硬盘&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/c72979256e8f41b11cccd0cfb48e8ee.jpg"
+width="2940"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/c72979256e8f41b11cccd0cfb48e8ee_huec4c6f6769eb5a19fb5d4af3caa62cff_818277_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/c72979256e8f41b11cccd0cfb48e8ee_huec4c6f6769eb5a19fb5d4af3caa62cff_818277_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="229"
+data-flex-basis="551px"
+>&lt;/p>
+&lt;p>选择刚刚保存的镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e0acfd7a4bd6469ad3d26d8a42e5d07.jpg"
+width="2299"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e0acfd7a4bd6469ad3d26d8a42e5d07_hu126cab8290477c930325d4e0b4625ffd_250557_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e0acfd7a4bd6469ad3d26d8a42e5d07_hu126cab8290477c930325d4e0b4625ffd_250557_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>选择部署系统的硬盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/098f380ed93e89475a221678d25caad.jpg"
+width="3138"
+height="1122"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/098f380ed93e89475a221678d25caad_hu4368701716ea6ac9e975869e9d0ee434_685040_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/098f380ed93e89475a221678d25caad_hu4368701716ea6ac9e975869e9d0ee434_685040_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="279"
+data-flex-basis="671px"
+>&lt;/p>
+&lt;p>选第一个模式&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4e699b3592e35534382547a911980b4.jpg"
+width="2299"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4e699b3592e35534382547a911980b4_hu38304cc376829cd5d63ffe6af4723219_315153_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4e699b3592e35534382547a911980b4_hu38304cc376829cd5d63ffe6af4723219_315153_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>选择&lt;code>重启&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cc58308f45f81a871ce930a2af1e2bf.jpg"
+width="2302"
+height="1279"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cc58308f45f81a871ce930a2af1e2bf_hu71b960db93c9e68546f4fe0afe778488_280001_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cc58308f45f81a871ce930a2af1e2bf_hu71b960db93c9e68546f4fe0afe778488_280001_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>等待程序部署和修复引导完成，成功进入系统&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/2f941b0304955f26262101809a06a27.jpg"
+width="2318"
+height="1279"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/2f941b0304955f26262101809a06a27_huc0a0deaf080c3b53700171e429af7c9a_510687_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/2f941b0304955f26262101809a06a27_huc0a0deaf080c3b53700171e429af7c9a_510687_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="181"
+data-flex-basis="434px"
+>&lt;/p>
+&lt;h2 id="结尾">结尾
+&lt;/h2>&lt;p>这样系统的迁移就完成了，这样的部署方式有没有不良影响还未知，不过内网传输文件终于可以跑满带宽了，泪目&lt;/p></description></item><item><title>在PVE中配置软路由</title><link>https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/</link><pubDate>Mon, 10 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/cover.jpg" alt="Featured image of post 在PVE中配置软路由" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>为了摆脱PC用网线直连主机来操作pve的窘境，我们在PVE中首当其冲应该安装的部分就是软路由，主流的软路由有&lt;strong>iKuai&lt;/strong>和&lt;strong>OpenWrt&lt;/strong>等，&lt;strong>OpenWrt&lt;/strong>又有着许多的发行版，这里我们用&lt;strong>iStoreOS&lt;/strong>为例，在PVE中安装软路由&lt;/p>
+&lt;h2 id="部署前的准备">部署前的准备
+&lt;/h2>&lt;ul>
+&lt;li>一台成功安装PVE的主机，可以参考&lt;a class="link" href="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/" >这篇文章&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="为软路由准备虚拟机">为软路由准备虚拟机
+&lt;/h2>&lt;p>在PVE管理页面的右上角选择创建虚拟机，&lt;strong>名称&lt;/strong>任意,&lt;strong>VM ID&lt;/strong>可以修改但不能冲突，这里使用默认，下一步&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1_hu699122af892996bf585443cfa25ea0d5_24555_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1_hu699122af892996bf585443cfa25ea0d5_24555_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>软路由的安装比较特殊，这里选择不使用任何介质&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2_hu0cee02120b2c9a165f3c3e4238f2cb7e_33423_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2_hu0cee02120b2c9a165f3c3e4238f2cb7e_33423_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>由于没有使用UEFI的固件，这里保持默认，下一步&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3_huc1b9a9237f58ee84ea8b7616cb468d71_30151_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3_huc1b9a9237f58ee84ea8b7616cb468d71_30151_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>不需要创建磁盘，直接点击删除，下一步&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4_hufef3690b0996a6d2c0159a25a06c69c0_35732_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4_hufef3690b0996a6d2c0159a25a06c69c0_35732_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>&lt;strong>核心数&lt;/strong>和&lt;strong>插槽&lt;/strong>根据你的平台决定，软路由性能需求不高，可以保持默认，或者也可以设置到与你的平台情况一致，PVE会动态分配资源，无需担心类别可以保持默认，也可以选择host（据说性能更好）&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6_hu3914c277acb1998541c6a22203b3a8cd_24143_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6_hu3914c277acb1998541c6a22203b3a8cd_24143_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>内存分配随意，这里保持默认&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7_hu7239a720725eef863bd773375ab261db_22399_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7_hu7239a720725eef863bd773375ab261db_22399_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>网络保持默认即可，模型使用&lt;strong>半虚拟化&lt;/strong>据说性能更佳，但可能不兼容某些老设备&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8_hu6e6becf96bcf73f7ffa542d234481912_29296_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8_hu6e6becf96bcf73f7ffa542d234481912_29296_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;h2 id="安装istoreos固件">安装iStoreOS固件
+&lt;/h2>&lt;p>在&lt;a class="link" href="https://fw.koolcenter.com/iStoreOS/" target="_blank" rel="noopener"
+>KoolCenter 固件下载服务器&lt;/a>中下载自己平台对应的固件，由于我们使用的是PVE虚拟机，这里就下载x86_64的固件，下载完成后解压&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image.png"
+width="1109"
+height="36"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image_hu4a8d5d1f12812648351b126efcc89737_5217_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image_hu4a8d5d1f12812648351b126efcc89737_5217_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="3080"
+data-flex-basis="7393px"
+>&lt;/p>
+&lt;p>依次点击&lt;strong>local - ISO镜像 - 上传&lt;/strong>，将iStoreOS的镜像上传，注意复制一下你的文件名，等会需要使用&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10.png"
+width="404"
+height="269"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10_hu08db59084c4d17231a679b56bc895b39_12745_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10_hu08db59084c4d17231a679b56bc895b39_12745_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>&lt;/p>
+&lt;p>选择宿主机的Shell功能，执行命令，这里的iso文件名是你即刚刚上传时的文件名&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qm importdisk &lt;span class="m">100&lt;/span> /var/lib/vz/template/iso/istoreos-22.03.6-2024051012-x86-64-squashfs-combined.img local-lvm
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>选择软路由虚拟机，选择&lt;strong>硬件&lt;/strong>，双击未使用的磁盘，点击添加，可以扩容一下磁盘，但不是必要的&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9.png"
+width="676"
+height="278"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9_hu5a404f922a2e3126f7e4a90626847515_36293_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9_hu5a404f922a2e3126f7e4a90626847515_36293_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="243"
+data-flex-basis="583px"
+>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11.png"
+width="600"
+height="218"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11_hue4a06a61a7dd2d9d30ff3568b797b311_19618_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11_hue4a06a61a7dd2d9d30ff3568b797b311_19618_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="275"
+data-flex-basis="660px"
+>&lt;/p>
+&lt;p>注意到这里已经有了第一个网卡，点击左上角的&lt;strong>添加 - 网络设备&lt;/strong>，将我们桥接的第二个网卡添加进去&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14.png"
+width="600"
+height="182"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14_hueabe0a70c57042b5451df8da4cf7c04d_20347_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14_hueabe0a70c57042b5451df8da4cf7c04d_20347_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="329"
+data-flex-basis="791px"
+>&lt;/p>
+&lt;p>选择软路由虚拟机，选择&lt;strong>选项 - 引导顺序 -编辑&lt;/strong>，将刚刚添加的磁盘启动，并拖到最上方&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12.png"
+width="1307"
+height="727"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12_hu40741c1752d19b6b64e5824f2541c7a6_98116_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12_hu40741c1752d19b6b64e5824f2541c7a6_98116_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13.png"
+width="640"
+height="267"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13_hu538f830d61e66881cd00ada61bd9a519_19478_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13_hu538f830d61e66881cd00ada61bd9a519_19478_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="239"
+data-flex-basis="575px"
+>&lt;/p>
+&lt;h2 id="配置istoreos作为旁路由">配置iStoreOS作为旁路由
+&lt;/h2>&lt;p>此时启动软路由虚拟机，点击控制台，等待引导结束，系统启动&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15.png"
+width="2250"
+height="1037"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15_hubb8fd10a056ea98441e24069ad03a1c1_420930_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15_hubb8fd10a056ea98441e24069ad03a1c1_420930_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="216"
+data-flex-basis="520px"
+>&lt;/p>
+&lt;p>按下回车键，进入命令行，输入命令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">quickstart
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用上下键选择选项&lt;strong>2&lt;/strong>
+&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16.png"
+width="390"
+height="159"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16_hu8e60265e5638429e2ce929bcae0d7be8_43134_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16_hu8e60265e5638429e2ce929bcae0d7be8_43134_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="588px"
+>&lt;/p>
+&lt;p>这里输入之前为虚拟机预留的ip，我这里是&lt;code>192.168.99.2&lt;/code>，子网掩码输入&lt;code>255.255.255.0&lt;/code>，使用上下键选择&lt;code>quit&lt;/code>离开，重启虚拟机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17.png"
+width="623"
+height="42"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17_hu90c1e1d2a38a8a954073b1123b14c787_9012_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17_hu90c1e1d2a38a8a954073b1123b14c787_9012_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1483"
+data-flex-basis="3560px"
+>&lt;/p>
+&lt;p>此时便可以在浏览器中输入&lt;code>192.168.99.2&lt;/code>进入iStoreOS的管理界面，默认的密码是&lt;code>password&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18.png"
+width="420"
+height="486"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18_hubfed1aa8e475298edb060dc40795db4d_146850_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18_hubfed1aa8e475298edb060dc40795db4d_146850_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="207px"
+>&lt;/p>
+&lt;p>虽然出现危险的可能性不大，但还是建议现在&lt;strong>系统 - 管理权 - 路由器密码&lt;/strong>处先修改密码&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19.png"
+width="1123"
+height="488"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19_hu225cfc792244915e1e580a7eefcf385a_52990_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19_hu225cfc792244915e1e580a7eefcf385a_52990_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="230"
+data-flex-basis="552px"
+>&lt;/p>
+&lt;p>点击&lt;strong>网络 - 接口 - 设备 - br-lan的配置&lt;/strong>，在网桥端口项将所有的网卡加入桥接&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-26.png"
+width="2538"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-26_hu6240ee3276a24ad16fefec8a02a1255e_116591_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-26_hu6240ee3276a24ad16fefec8a02a1255e_116591_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="470"
+data-flex-basis="1128px"
+>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-27.png"
+width="837"
+height="398"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-27_hu212228adfcf97d8b9fd3faa3b9e9d046_43075_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-27_hu212228adfcf97d8b9fd3faa3b9e9d046_43075_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="210"
+data-flex-basis="504px"
+>&lt;/p>
+&lt;p>因为我将软路由作为旁路由且不负责dhcp，所以不需要再添加接口，点击&lt;strong>网络向导&lt;/strong>，选择&lt;strong>配置为旁路由&lt;/strong>，在&lt;strong>手动配置&lt;/strong>中输入为&lt;code>192.168.99.2&lt;/code>，网关为主路由地址，关闭&lt;strong>DHCPv4服务&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20.png"
+width="600"
+height="886"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20_hueacf499a7a3140355ee3c5a391a7c974_59539_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20_hueacf499a7a3140355ee3c5a391a7c974_59539_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="67"
+data-flex-basis="162px"
+>&lt;/p>
+&lt;p>点击&lt;strong>网络 - 接口 - lan - 编辑 - DHCP服务器 - 常规设置&lt;/strong>，选择&lt;strong>忽略此接口&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21.png"
+width="2428"
+height="784"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21_hu7006440cdcf4cbbb1d31cdd8b46afff1_119439_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21_hu7006440cdcf4cbbb1d31cdd8b46afff1_119439_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="309"
+data-flex-basis="743px"
+>&lt;/p>
+&lt;p>此时拔掉PC与软路由相连的网线，将作为主机的一个网口与主路由器的lan口连接，软路由能正常联网即表明配置成功，PC上的以太网设置也可以还原了&lt;/p>
+&lt;h2 id="结尾">结尾
+&lt;/h2>&lt;p>软路由的设置到这里就结束了&lt;/p></description></item><item><title>在物理机上安装PVE</title><link>https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/</link><pubDate>Fri, 07 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.jpg" alt="Featured image of post 在物理机上安装PVE" />&lt;h2 id="部署前的准备">部署前的准备
+&lt;/h2>&lt;ul>
+&lt;li>U盘一个&lt;/li>
+&lt;li>PC一台，提前安装好&lt;strong>rufus&lt;/strong>或&lt;strong>balenaEtcher&lt;/strong>等软件用于制作启动盘&lt;/li>
+&lt;/ul>
+&lt;p>我用于搭建All in One的配置如下：&lt;/p>
+&lt;table>
+&lt;tr>
+&lt;td>主板&lt;/td>
+&lt;td>B365&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CPU&lt;/td>
+&lt;td>i3-8100&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>内存&lt;/td>
+&lt;td>DDR4 16Gx2&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>硬盘&lt;/td>
+&lt;td>致钛PC005 512G&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td> &lt;/td>
+&lt;td>西数HC510&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td> &lt;/td>
+&lt;td>西数HC510&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>电源&lt;/td>
+&lt;td>海韵SSP-250SUB&lt;/td>
+&lt;/tr>
+&lt;/table>
+&lt;h2 id="安装pve">安装PVE
+&lt;/h2>&lt;p>从&lt;a class="link" href="https://www.proxmox.com/en/downloads" target="_blank" rel="noopener"
+>PVE官网下载页面&lt;/a>下载安装镜像，这里我选择的是最新的 8.2 版本&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1.png"
+width="1353"
+height="933"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1_hu28d41a32c9fe14be76f637c3cfb8e3d5_116383_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1_hu28d41a32c9fe14be76f637c3cfb8e3d5_116383_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="145"
+data-flex-basis="348px"
+>&lt;/p>
+&lt;p>将你的u盘插入PC，使用启动盘制作软件制作启动盘，这里以&lt;strong>balenaEtcher&lt;/strong>为例：
+打开&lt;strong>balenaEtcher&lt;/strong>，选择从&lt;strong>文件烧录&lt;/strong>，再选择刚刚下载的镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2.png"
+width="802"
+height="507"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2_hu3f3e120e428ecd3e9c0ef9063bb8f29a_24180_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2_hu3f3e120e428ecd3e9c0ef9063bb8f29a_24180_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;p>选择你插入的U盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3.png"
+width="802"
+height="507"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3_huf045ea4e15598d48d2da6596faa30058_25750_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3_huf045ea4e15598d48d2da6596faa30058_25750_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;p>再点击立即烧录即可，&lt;strong>注意不要点击可能弹窗的格式化U盘&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4.png"
+width="802"
+height="507"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4_hu0518109736a0561937288e6fa29bf818_17742_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4_hu0518109736a0561937288e6fa29bf818_17742_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;p>将U盘从PC弹出，插入到将要安装PVE的主机，随后通过U盘引导开机（可能需要进入BIOS进行设置），这里直接回车执行第一项安装命令&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5.png"
+width="2195"
+height="761"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5_hu4e453fbd289f2ee9a959a2d53eb0489b_367478_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5_hu4e453fbd289f2ee9a959a2d53eb0489b_367478_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="288"
+data-flex-basis="692px"
+>&lt;/p>
+&lt;p>在协议界面选择&lt;strong>I aggree&lt;/strong>后，选择安装的硬盘，根据你的情况选择硬盘，这里我选择的是512G的那块固态，next&lt;/p>
+&lt;p>区域设置界面，在&lt;strong>Country&lt;/strong>选项中选择&lt;strong>China&lt;/strong>，next&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6.png"
+width="1533"
+height="597"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6_hu0789b667699a5e758e84086d4a965162_304632_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6_hu0789b667699a5e758e84086d4a965162_304632_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="256"
+data-flex-basis="616px"
+>&lt;/p>
+&lt;p>密码设置界面，输入你的密码，建议设置的复杂一点，next&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7.png"
+width="843"
+height="416"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7_hu167812322c42da9f67eb081623c1f772_95163_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7_hu167812322c42da9f67eb081623c1f772_95163_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="486px"
+>&lt;/p>
+&lt;p>网络设置界面，选择一个网卡作为pve的管理入口，这里我有两个网卡我选择了第一个，&lt;strong>Hostname&lt;/strong>可以任意设置一个，&lt;strong>IP Address&lt;/strong>如果你不想把软路由设置成主路由，就把地址设置到和你的主路由同一个网段，例如我想把软路由作为旁路由，所以将ip设置为&lt;code>192.168.99.3&lt;/code>，&lt;strong>Gateway&lt;/strong>则设置为主路由的地址&lt;code>192.168.99.1&lt;/code>。如果准备将软路由作为主路由，则ip可以在局域网网段下任意设置，但注意不要设置成之后为软路由预留的地址，不过之后的教程只会介绍前一个方案。&lt;strong>DNS Server&lt;/strong>保持默认即可，next，Install&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8.png"
+width="1731"
+height="660"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8_hue22e2f90e8f48ccf9684ed9c2c4e39a7_458526_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8_hue22e2f90e8f48ccf9684ed9c2c4e39a7_458526_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="262"
+data-flex-basis="629px"
+>&lt;/p>
+&lt;h2 id="连接pve">连接PVE
+&lt;/h2>&lt;p>点击reboot，关机完成重启前拔出启动盘，让机器通过硬盘引导，随后直接将PC的网口连接到All in One主机刚刚选择作为管理口的网口，以防错误我们主动将PC和主机设置同一网段，如果是&lt;strong>Windows 11&lt;/strong>的话，打开&lt;strong>设置 - 网络和Internet - 高级网络设置 - 以太网（注意是你PC的网卡对应的以太网）- Internet 协议版本 4（TCP/IPv4）- 属性&lt;/strong>，将PC的ip地址设置成同一个网段，这里用的是&lt;code>192.168.99.99&lt;/code>，子网掩码保持默认，默认网关设置成为软路由预设的网关，点击确定即可&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9.png"
+width="1319"
+height="693"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9_hu7f9402435d5955ed17297bd656233a67_149980_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9_hu7f9402435d5955ed17297bd656233a67_149980_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="190"
+data-flex-basis="456px"
+>&lt;/p>
+&lt;p>随后打开PC的浏览器，输入&lt;code>192.168.99.3:8006&lt;/code>，如果提示不是私密连接则点高级再点击继续前往&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10.png"
+width="639"
+height="547"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10_hu639a1d41bd821cc0fbeee33c3352dc91_56452_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10_hu639a1d41bd821cc0fbeee33c3352dc91_56452_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="116"
+data-flex-basis="280px"
+>&lt;/p>
+&lt;p>打开PVE管理页面后，在&lt;strong>用户名&lt;/strong>输入root，密码即为安装时设置的密码，最后一个选项可以设置语言&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11.png"
+width="400"
+height="196"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11_hu0cea37fc23deb949abe4d66153b799b6_12064_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11_hu0cea37fc23deb949abe4d66153b799b6_12064_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="204"
+data-flex-basis="489px"
+>&lt;/p>
+&lt;h2 id="配置网卡">配置网卡
+&lt;/h2>&lt;p>作为旁路由的软路由其实只需要一个网口，但是既然我们有两个网卡也不能浪费。在PVE中点击你的宿主机，选择&lt;strong>系统 - 网络&lt;/strong>。可以看到其中一个网卡PVE已经自动为我们完成了桥接&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12.png"
+width="656"
+height="71"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12_hu6125e3d56b4631aa3cccccc0e88434be_7155_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12_hu6125e3d56b4631aa3cccccc0e88434be_7155_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="923"
+data-flex-basis="2217px"
+>&lt;/p>
+&lt;p>点击&lt;strong>创建 - Linux Bridge&lt;/strong>，在桥接端口中输入第二个网卡的名称，点击创建&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13.png"
+width="600"
+height="250"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13_hue37e230f51cf6d777e5271b330206d5a_17776_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13_hue37e230f51cf6d777e5271b330206d5a_17776_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="alt text"
+class="gallery-image"
+data-flex-grow="240"
+data-flex-basis="576px"
+>&lt;/p>
+&lt;h2 id="硬件直通的预先准备">硬件直通的预先准备
+&lt;/h2>&lt;p>需要提前主板bios中开启虚拟化功能，不同的平台设置不同。开启虚拟化后，点击宿主机的Shell功能，修改&lt;strong>grub&lt;/strong>配置&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vim /etc/default/grub &lt;span class="c1"># 没有vim则apt安装，或者使用vi&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>将&lt;code>GRUB_CMDLINE_LINUX_DEFAULT&lt;/code>项修改为&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">GRUB_CMDLINE_LINUX_DEFAULT=&amp;#34;quiet intel_iommu=on iommu=pt&amp;#34;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>修改完成后更新&lt;strong>grup&lt;/strong>，并重启&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">update-grub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">reboot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="结尾">结尾
+&lt;/h2>&lt;p>至此，PVE已经可以正常使用了，关于换源等PVE优化并非必要，网上有很多其他教程可以参考&lt;/p></description></item><item><title>使用 Hugo + Github Pages 部署个人博客</title><link>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</link><pubDate>Thu, 06 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/cover.jpg" alt="Featured image of post 使用 Hugo + Github Pages 部署个人博客" />&lt;h2 id="配置环境">配置环境
+&lt;/h2>&lt;ul>
+&lt;li>Windows PC一台且已经安装有Git&lt;/li>
+&lt;li>Github账号一个&lt;/li>
+&lt;/ul>
+&lt;h2 id="创建博客仓库">创建博客仓库
+&lt;/h2>&lt;ol>
+&lt;li>在&lt;a class="link" href="https://github.com/" target="_blank" rel="noopener"
+>github主页&lt;/a>点击New按钮为博客创建一个仓库&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/1.png"
+width="309"
+height="182"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/1_hu03a4733975924e82510f31fb9ac13c4e_7253_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/1_hu03a4733975924e82510f31fb9ac13c4e_7253_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="169"
+data-flex-basis="407px"
+>&lt;/p>
+&lt;ol start="2">
+&lt;li>在&lt;strong>Repository name&lt;/strong>项填写仓库名，注意必须使用&lt;code>&amp;lt;user&amp;gt;.github.io&lt;/code>的格式，&lt;code>&amp;lt;user&amp;gt;&lt;/code>为Github用户名。可选在&lt;strong>Description&lt;/strong>填写仓库描述，注意需要勾选&lt;strong>Initialize this repository with a README&lt;/strong>选项。&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/2.png"
+width="768"
+height="811"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/2_hube3e8c9eebaf544b695bb1e87a8c6a34_61225_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/2_hube3e8c9eebaf544b695bb1e87a8c6a34_61225_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="94"
+data-flex-basis="227px"
+>&lt;/p>
+&lt;h2 id="安装hugo">安装Hugo
+&lt;/h2>&lt;ol>
+&lt;li>版本较新的Windows推荐直接使用winget的方式安装Hugo，其他操作系统的安装方法可以查阅官方文档：&lt;a class="link" href="https://gohugo.io/getting-started/installing/" target="_blank" rel="noopener"
+>Hugo官方文档&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">winget install Hugo.Hugo.Extended
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果使用Chocolatey命令如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">choco install hugo-extended
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol start="2">
+&lt;li>安装完成后查看hugo版本验证安装是否成功&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">hugo version
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="在本地创建博客项目文件夹">在本地创建博客项目文件夹
+&lt;/h2>&lt;ol>
+&lt;li>创建一个文件夹用于存放博客项目并在终端中打开&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/3.png"
+width="258"
+height="311"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/3_huc6f24fcae201a8dd022351b7429ca20a_13078_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/3_huc6f24fcae201a8dd022351b7429ca20a_13078_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="82"
+data-flex-basis="199px"
+>&lt;/p>
+&lt;ol start="2">
+&lt;li>使用hugo创建网站项目&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">hugo new site ratmomo-blog &lt;span class="c1"># 可以替换成任意你想要的名字&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="安装主题">安装主题
+&lt;/h2>&lt;ol>
+&lt;li>找到一款你喜欢的主题，可以使用&lt;a class="link" href="https://themes.gohugo.io/" target="_blank" rel="noopener"
+>Hugo社区提供的主题&lt;/a>，也可以使用你从其他地方找的心仪主题&lt;/li>
+&lt;li>根据主题的页面或者主题提供的文档安装主题，例如本博客使用的主题&lt;a class="link" href="https://stack.jimmycai.com/" target="_blank" rel="noopener"
+>Stack&lt;/a>。鉴于我们已经使用了Git创建网站文件，我们使用&lt;code>git submodule&lt;/code>命令将主题作为子模块使用&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git submodule add https://github.com/CaiJimmy/hugo-theme-stack/ themes/hugo-theme-stack
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol>
+&lt;li>将&lt;code>themes&lt;/code>文件夹中安装好的主题中的&lt;code>exampelSite&lt;/code>文件夹中的配置文件&lt;code>hugo.yaml&lt;/code>(也有可能是&lt;code>hugo.toml&lt;/code>之类的)复制到你的项目文件夹中，再将&lt;code>archetypes&lt;/code>中的文件复制到你的项目文件夹的&lt;code>archetypes&lt;/code>中，根据配置文件的注释和主题的官方文档修改配置，如果使用的是我推荐的&lt;strong>Stack&lt;/strong>，需要注意以下配置：&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">baseurl&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://example.com &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 需要修改成你的网站&amp;lt;user&amp;gt;.github.io&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Example Site&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 需要修改成你想在标签页显示的名称&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">DefaultContentLanguage&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">en&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 如果是中文博客注意修改成zh-cn，以添加i18n支持&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">hasCJKLanguage&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 如果是DefaultContentLanguage修改成zh-cn，修改为true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">sidebar&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">emoji&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">🍥&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">subtitle&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Lorem ipsum dolor sit amet, consectetur adipiscing elit.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">avatar&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">enabled&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">local&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">src&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">img/avatar.png&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 头像的位置在assets/img/avatar.png&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">article&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">math&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 使用数学公式需要打开&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="创建文章">创建文章
+&lt;/h2>&lt;ol>
+&lt;li>使用&lt;strong>Hugo&lt;/strong>创建文章，生成的&lt;strong>Markdowen&lt;/strong>文件的元数据中&lt;strong>image&lt;/strong>可以指定文章封面，&lt;strong>draft&lt;/strong>表示文章是否属于草稿，草稿文件不会被发布，&lt;strong>hidden&lt;/strong>表示文章是否会被隐藏&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">hugo new post/test/index.md
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol start="2">
+&lt;li>完成后可以使用以下命令预览：&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">hugo server -D
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="发布文章">发布文章
+&lt;/h2>&lt;p>直接执行&lt;code>hugo&lt;/code>命令可以为你的博客项目在public文件夹中生成静态的html文件，发布博客实际上只需要向仓库推送public文件夹中的内容&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">hugo
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> .&lt;span class="se">\p&lt;/span>ublic&lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>将public文件夹初始化为git仓库，并将远程仓库地址设置为Github Pages的仓库地址&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git init -b main
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git remote add origin 你的远程仓库地址
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git add .
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>随后便可以推通过Git推送文章了&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git commit -m &lt;span class="s2">&amp;#34;First commit&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git push -u origin main
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="番外篇自定义你的站点">番外篇：自定义你的站点
+&lt;/h2>&lt;h3 id="自定义网站图标">自定义网站图标
+&lt;/h3>&lt;p>在配置文件&lt;code>hugo.yaml&lt;/code>中可以指定网站的图标&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">params&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">favicon&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/favicon.ico&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 实际上的位置是static/favicon.ico&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>将你的ico图标文件放置在你的项目文件夹中的static文件夹并命名为favicon即可&lt;/p>
+&lt;h3 id="修改你的主题">修改你的主题
+&lt;/h3>&lt;p>这里以为stack主题的article页面添加网易云音乐的外链为例：在&lt;code>themes\hugo-theme-stack\layouts\partials\article\components&lt;/code>文件夹中新建一个文件&lt;code>music.html&lt;/code>写入网易云音乐的外链模板&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="c">&amp;lt;!-- .Params.musicid可以获取Markdown文件元数据中的musicid这个属性，这样我们便可以在markdown中指定我们要插入文章的音乐 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">iframe&lt;/span> &lt;span class="na">frameborder&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;no&amp;#34;&lt;/span> &lt;span class="na">border&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0&amp;#34;&lt;/span> &lt;span class="na">marginwidth&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0&amp;#34;&lt;/span> &lt;span class="na">marginheight&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">100%&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">86&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;//music.163.com/outchain/player?type=2&amp;amp;id={{ .Params.musicid }}&amp;amp;auto=0&amp;amp;height=66&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">iframe&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>我希望网易云音乐的外链在页面中位于文章中的标题之下，文章内容之上，所以需要编辑content.html的内容&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">section&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;article-content&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c">&amp;lt;!-- Refer to https://discourse.gohugo.io/t/responsive-tables-in-markdown/10639/5 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> {{ $wrappedTable := printf &amp;#34;&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">\&amp;#34;table-wrapper\&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>${1}&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&amp;#34; }}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c">&amp;lt;!-- 下面三行是增加的内容 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> {{ if .Params.musicid }}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> {{ partial &amp;#34;article/components/music&amp;#34; . }}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> {{ end }}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> {{ .Content | replaceRE &amp;#34;(&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">table&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>(?:.|\n)+?&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">table&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>)&amp;#34; $wrappedTable | safeHTML }}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">section&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>打开项目目录下的&lt;code>archetypes&lt;/code>中的&lt;code>default.md&lt;/code>文件，在元数据中添加一行&lt;code>musicid&lt;/code>属性&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-markdown" data-lang="markdown">&lt;span class="line">&lt;span class="cl">musicid:
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这样就完成了主题的修改，不过由于我们安装主题使用的是&lt;code>Git submodule&lt;/code>的方法，因此本地的修改实际上不能在Github Pages产生效果，我们需要一些额外的工作。首先打开你安装的主题的Github仓库并fork&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/6.png"
+width="556"
+height="75"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/6_hu7d8ca810b70b118c5a357f85edaa84af_9167_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/6_hu7d8ca810b70b118c5a357f85edaa84af_9167_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="741"
+data-flex-basis="1779px"
+>&lt;/p>
+&lt;p>修改我们&lt;code>submodule&lt;/code>的远程仓库地址，打开项目目录下的&lt;code>.gitmodules&lt;/code>，将&lt;code>submodule&lt;/code>的url修改成远程仓库的地址，随后执行命令更新远程仓库地址&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git submodule sync
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>随后将我们的修改推送到远程仓库即可&lt;/p>
+&lt;h2 id="番外篇使用github-action自动发布博客">番外篇：使用GitHub Action自动发布博客
+&lt;/h2>&lt;p>创建一个新的仓库，用于存放整个项目，作为博客源仓库&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/5.png"
+width="769"
+height="831"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/5_hudc0a7ae8eaadae9041900fac690b7298_67363_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/5_hudc0a7ae8eaadae9041900fac690b7298_67363_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="92"
+data-flex-basis="222px"
+>&lt;/p>
+&lt;p>使用&lt;code>git remote set-url&lt;/code>命令更改远程仓库地址&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git remote -v
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git remote set-url origin git@github.com:ratmomo/blog-source.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git remote -v
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在本地仓库中创建文件&lt;code>.github\workflows\gh-pages.yml&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yml" data-lang="yml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">GitHub Pages&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">push&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branches&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">main &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Set a branch to deploy&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">pull_request&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">jobs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">deploy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">runs-on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu-22.04&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">concurrency&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">group&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ github.workflow }}-${{ github.ref }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/checkout@v4&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">submodules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Fetch Hugo themes (true OR recursive)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">fetch-depth&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Fetch all history for .GitInfo and .Lastmod&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Setup Hugo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">peaceiris/actions-hugo@v3&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">hugo-version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;0.127.0&amp;#39;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 注意修改成你的hugo版本，以防兼容性错误&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">extended&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 是否启用hugo extended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Build&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">hugo --minify&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">working-directory&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./ratmomo-blog&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 注意修改成你使用hugo创建的项目名称&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">peaceiris/actions-gh-pages@v3&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">if&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">github.ref == &amp;#39;refs/heads/main&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">PERSONAL_TOKEN&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.ACTION_TOKEN }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">PUBLISH_DIR&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./ratmomo-blog/public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 注意修改成你使用hugo创建的项目名称&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">EXTERNAL_REPOSITORY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ratmomo/ratmomo.github.io&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 你的Github Pages远程仓库名&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># PUBLISH_BRANCH: master 如果不想推送到gh-pages分支，可以添加这一行&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在&lt;a class="link" href="https://github.com/settings/profile" target="_blank" rel="noopener"
+>Github Profile&lt;/a>页面下&lt;strong>Developer setting - Personal access tokens&lt;/strong>中创建一个tokens，注意勾选&lt;strong>repo&lt;/strong>和&lt;strong>workflow&lt;/strong>权限&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/7.png"
+width="782"
+height="579"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/7_hu44a62eb830c663f4c1eaa0086cef3141_47498_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/7_hu44a62eb830c663f4c1eaa0086cef3141_47498_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="135"
+data-flex-basis="324px"
+>&lt;/p>
+&lt;p>在博客源仓库的&lt;strong>Settings-Secrets and variables-Actions-Repository secrets&lt;/strong>中添加一个&lt;strong>ACTION_TOKEN&lt;/strong>内容为刚刚创建的tokens&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/8.png"
+width="794"
+height="407"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/8_hud30d817dcba2b43827cfba23c50df3b7_13056_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8-hugo--github-pages-%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/8_hud30d817dcba2b43827cfba23c50df3b7_13056_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="195"
+data-flex-basis="468px"
+>&lt;/p>
+&lt;p>接下来直接push本地的修改到远程博客源仓库，Github Action会为我们完成生成静态页面和推送到GitHub Pages仓库的任务&lt;/p>
+&lt;p>如果之前配置的推送目标时gh-pages分支，注意将GitHub Pages仓库的&lt;strong>Sittings - Pages - Build and deployment - Branch&lt;/strong>修改为gh-pages&lt;/p>
+&lt;h2 id="参考">参考
+&lt;/h2>&lt;blockquote>
+&lt;p>&lt;a class="link" href="https://gohugo.io/documentation/" target="_blank" rel="noopener"
+>Hugo Documentation | Hugo&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://stack.jimmycai.com/config/site" target="_blank" rel="noopener"
+>Site-wide settings | Stack&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://cuttontail.blog/blog/create-a-wesite-using-github-pages-and-hugo/#8-%E6%9C%AC%E5%9C%B0%E8%B0%83%E8%AF%95%E5%92%8C%E9%A2%84%E8%A7%88" target="_blank" rel="noopener"
+>如何用 GitHub Pages + Hugo 搭建个人博客 · 小绵尾巴&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://www.lixueduan.com/posts/blog/02-add-giscus-comment/#5-%E9%85%8D%E7%BD%AE%E5%88%B0%E5%8D%9A%E5%AE%A2" target="_blank" rel="noopener"
+>Hugo 博客引入 Giscus 评论系统 -&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://www.pseudoyu.com/zh/2022/05/29/deploy_your_blog_using_hugo_and_github_action/" target="_blank" rel="noopener"
+>Hugo + GitHub Action，搭建你的博客自动发布系统 · Pseudoyu&lt;/a>&lt;/p>
+&lt;/blockquote></description></item></channel></rss>
