@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PVE on ratmomo's blog</title><link>https://ratmomo.github.io/tags/pve/</link><description>Recent content in PVE on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 13 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://ratmomo.github.io/tags/pve/index.xml" rel="self" type="application/rss+xml"/><item><title>使用Clonezilla将PVE虚拟机迁移到物理机</title><link>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</link><pubDate>Thu, 13 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cover.jpg" alt="Featured image of post 使用Clonezilla将PVE虚拟机迁移到物理机" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>厌烦了虚拟机的性能损失和不稳定，思来想去整了个n1盒子作旁路由，决定把PVE中的虚拟机迁移到物理机上。找了一圈方案貌似Clonezilla最简单安全，所以决定试试。&lt;/p>
+&lt;blockquote>
+&lt;p>以下操作有危险，请保存好你的数据！！！&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="制作clonezilla启动盘">制作Clonezilla启动盘
+&lt;/h2>&lt;p>从&lt;a class="link" href="https://clonezilla.org/downloads.php" target="_blank" rel="noopener"
+>这里&lt;/a>下载Clonezilla的镜像文件，注意选择iso镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image.png"
+width="850"
+height="254"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image_hu3ef6e36e8cdd8b758ad7784b3d44e4bd_26514_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image_hu3ef6e36e8cdd8b758ad7784b3d44e4bd_26514_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="334"
+data-flex-basis="803px"
+>&lt;/p>
+&lt;p>使用烧录软件将U盘制作成启动盘，这里以&lt;strong>balenaEtcher&lt;/strong>为例，使用&lt;strong>Fusion&lt;/strong>等等也是可以的（注意烧录完成后如果弹出格式化硬盘，务必取消）&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-1.png"
+width="802"
+height="507"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-1_hud46ad1698bfffe367db0cd2f602fa344_22222_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-1_hud46ad1698bfffe367db0cd2f602fa344_22222_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;h2 id="备份系统">备份系统
+&lt;/h2>&lt;p>将u盘插入装有PVE虚拟机的主机上，登录PVE管理界面，点击&lt;strong>需要备份的虚拟机 - 硬件 - 添加 - USB设备&lt;/strong>，将刚刚插上的硬盘直通给虚拟机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-2.png"
+width="1430"
+height="804"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-2_hu84b2f55f0e5b363bac0c08b68babeed9_101282_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-2_hu84b2f55f0e5b363bac0c08b68babeed9_101282_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;p>点击&lt;strong>选项 - 引导顺序&lt;/strong>，将刚刚直通的usb启动，并拖到第一位，重启虚拟机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-3.png"
+width="1329"
+height="819"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-3_huf65cab0f4aa5ae52a627267bb914990e_99042_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-3_huf65cab0f4aa5ae52a627267bb914990e_99042_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="389px"
+>&lt;/p>
+&lt;p>进入Clonezilla后，使用上下键选择语言&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-4.png"
+width="1320"
+height="990"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-4_huf723d8fc8c47e8436491d15f6fd0fd47_131433_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-4_huf723d8fc8c47e8436491d15f6fd0fd47_131433_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>键盘配置保持默认&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-5.png"
+width="1320"
+height="990"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-5_hub4e14903614b3d84033ddfaa97f95339_66802_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-5_hub4e14903614b3d84033ddfaa97f95339_66802_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择使用再生龙&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-6.png"
+width="1320"
+height="990"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-6_hua1d94ee5d1611785be4d3527fca89e99_70563_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-6_hua1d94ee5d1611785be4d3527fca89e99_70563_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择第一项，保存到镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-7.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-7_hu923c49ea93f1e40ab1d4e648ad9b28b8_208000_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-7_hu923c49ea93f1e40ab1d4e648ad9b28b8_208000_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>我要把镜像保存到主机的机械硬盘中，所以直接选第一项，如果有别的需求可以按需选择（前提是已经将硬盘直通给虚拟机）&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-8.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-8_hu810d88f93f19d90c5a97155197b64f9f_176978_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-8_hu810d88f93f19d90c5a97155197b64f9f_176978_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>检查要储存备份的硬盘是否有正常显示，若正常使用&lt;code>Ctrl+C&lt;/code>退出此页面&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-9.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-9_hu99ea401d73ab9a5633aab87d9425d277_132431_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-9_hu99ea401d73ab9a5633aab87d9425d277_132431_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择要储存备份的硬盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-10.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-10_hu7c93139d6ebed1193a786cf05e7da7c7_226982_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-10_hu7c93139d6ebed1193a786cf05e7da7c7_226982_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择跳过检查&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-11.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-11_hu75524a657c21551f44fa9aee7500a9dd_145736_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-11_hu75524a657c21551f44fa9aee7500a9dd_145736_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择完目录后，点击选择&lt;code>Done&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-12.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-12_hu8c144fbe0dc7fada13a8bea1bd316b7c_145329_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-12_hu8c144fbe0dc7fada13a8bea1bd316b7c_145329_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择第一项&lt;code>初学模式&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-13.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-13_hue0569a1e9f5d514a58ffca1f855216a1_98257_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-13_hue0569a1e9f5d514a58ffca1f855216a1_98257_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择&lt;code>储存本机硬盘为镜像文件&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-14.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-14_hu88b2c62f90d337ad100e0e95b831edda_148672_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-14_hu88b2c62f90d337ad100e0e95b831edda_148672_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>输入镜像名称，默认即可&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-15.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-15_hu43fa6f0c8ed83cce4ed1cf44ff1b16b8_102981_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-15_hu43fa6f0c8ed83cce4ed1cf44ff1b16b8_102981_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择要备份的硬盘，一般sda是系统盘，按空格键选择&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-16.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-16_hu7667f2817f7a00923a66f3a2f08745f5_138500_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-16_hu7667f2817f7a00923a66f3a2f08745f5_138500_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择压缩方式，默认的第二项即可&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-17.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-17_hu88a4feb906a68fe82379cdc0791c043b_108785_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-17_hu88a4feb906a68fe82379cdc0791c043b_108785_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>跳过检查&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-18.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-18_hu1b09f2f90cae0e1f8bdb543e9e18e1f6_140262_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-18_hu1b09f2f90cae0e1f8bdb543e9e18e1f6_140262_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>跳过检查&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-19.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-19_huf91675b27c0a2ab56454036e91741ad0_110757_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-19_huf91675b27c0a2ab56454036e91741ad0_110757_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择不加密，当操作完成后选择关机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-20.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-20_hu560f5b0791ccd1b316823ecc1868c3aa_88956_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-20_hu560f5b0791ccd1b316823ecc1868c3aa_88956_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;h2 id="恢复系统">恢复系统
+&lt;/h2>&lt;p>重启主机，进入Bios，将U盘设为引导顺序的第一位&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e223e37b64295f25d4fb9f0c587c0bd.jpg"
+width="2306"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e223e37b64295f25d4fb9f0c587c0bd_hu9bea9fb22eaed8138a5cca0fa29ea2a1_866452_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e223e37b64295f25d4fb9f0c587c0bd_hu9bea9fb22eaed8138a5cca0fa29ea2a1_866452_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="432px"
+>&lt;/p>
+&lt;p>进入Clonezilla，前面的选项照旧，这里的硬盘选择之前存储镜像的硬盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/ab437103f8e8ecba274ecd9c96f9860.jpg"
+width="3138"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/ab437103f8e8ecba274ecd9c96f9860_hu8f1f359a4f572c7af9c4c49fdaacbb95_1103748_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/ab437103f8e8ecba274ecd9c96f9860_hu8f1f359a4f572c7af9c4c49fdaacbb95_1103748_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="588px"
+>&lt;/p>
+&lt;p>目录选择之前存储镜像的目录&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4b6b372656b268eafc7d6b501d62468.jpg"
+width="2297"
+height="1279"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4b6b372656b268eafc7d6b501d62468_hu1464fe2373a97ca62cfc5ad5df644bef_502784_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4b6b372656b268eafc7d6b501d62468_hu1464fe2373a97ca62cfc5ad5df644bef_502784_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>选择初学模式&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cea8e115bb70a45be31210fc5614912.jpg"
+width="2305"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cea8e115bb70a45be31210fc5614912_hu1284ee02582a90eec8c5dc277c47e28a_282194_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cea8e115bb70a45be31210fc5614912_hu1284ee02582a90eec8c5dc277c47e28a_282194_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="432px"
+>&lt;/p>
+&lt;p>选择&lt;code>还原镜像文件到本机硬盘&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/c72979256e8f41b11cccd0cfb48e8ee.jpg"
+width="2940"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/c72979256e8f41b11cccd0cfb48e8ee_huec4c6f6769eb5a19fb5d4af3caa62cff_818277_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/c72979256e8f41b11cccd0cfb48e8ee_huec4c6f6769eb5a19fb5d4af3caa62cff_818277_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="229"
+data-flex-basis="551px"
+>&lt;/p>
+&lt;p>选择刚刚保存的镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e0acfd7a4bd6469ad3d26d8a42e5d07.jpg"
+width="2299"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e0acfd7a4bd6469ad3d26d8a42e5d07_hu126cab8290477c930325d4e0b4625ffd_250557_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e0acfd7a4bd6469ad3d26d8a42e5d07_hu126cab8290477c930325d4e0b4625ffd_250557_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>选择部署系统的硬盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/098f380ed93e89475a221678d25caad.jpg"
+width="3138"
+height="1122"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/098f380ed93e89475a221678d25caad_hu4368701716ea6ac9e975869e9d0ee434_685040_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/098f380ed93e89475a221678d25caad_hu4368701716ea6ac9e975869e9d0ee434_685040_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="279"
+data-flex-basis="671px"
+>&lt;/p>
+&lt;p>选第一个模式&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4e699b3592e35534382547a911980b4.jpg"
+width="2299"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4e699b3592e35534382547a911980b4_hu38304cc376829cd5d63ffe6af4723219_315153_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4e699b3592e35534382547a911980b4_hu38304cc376829cd5d63ffe6af4723219_315153_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>选择&lt;code>重启&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cc58308f45f81a871ce930a2af1e2bf.jpg"
+width="2302"
+height="1279"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cc58308f45f81a871ce930a2af1e2bf_hu71b960db93c9e68546f4fe0afe778488_280001_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cc58308f45f81a871ce930a2af1e2bf_hu71b960db93c9e68546f4fe0afe778488_280001_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>等待程序部署和修复引导完成，成功进入系统&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/2f941b0304955f26262101809a06a27.jpg"
+width="2318"
+height="1279"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/2f941b0304955f26262101809a06a27_huc0a0deaf080c3b53700171e429af7c9a_510687_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/2f941b0304955f26262101809a06a27_huc0a0deaf080c3b53700171e429af7c9a_510687_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="181"
+data-flex-basis="434px"
+>&lt;/p>
+&lt;h2 id="结尾">结尾
+&lt;/h2>&lt;p>这样系统的迁移就完成了，这样的部署方式有没有不良影响还未知，不过内网传输文件终于可以跑满带宽了，泪目&lt;/p></description></item><item><title>在PVE中配置软路由</title><link>https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/</link><pubDate>Mon, 10 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/cover.jpg" alt="Featured image of post 在PVE中配置软路由" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>为了摆脱PC用网线直连主机来操作pve的窘境，我们在PVE中首当其冲应该安装的部分就是软路由，主流的软路由有&lt;strong>iKuai&lt;/strong>和&lt;strong>OpenWrt&lt;/strong>等，&lt;strong>OpenWrt&lt;/strong>又有着许多的发行版，这里我们用&lt;strong>iStoreOS&lt;/strong>为例，在PVE中安装软路由&lt;/p>
+&lt;h2 id="部署前的准备">部署前的准备
+&lt;/h2>&lt;ul>
+&lt;li>一台成功安装PVE的主机，可以参考&lt;a class="link" href="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/" >这篇文章&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="为软路由准备虚拟机">为软路由准备虚拟机
+&lt;/h2>&lt;p>在PVE管理页面的右上角选择创建虚拟机，&lt;strong>名称&lt;/strong>任意,&lt;strong>VM ID&lt;/strong>可以修改但不能冲突，这里使用默认，下一步&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1_hu699122af892996bf585443cfa25ea0d5_24555_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-1_hu699122af892996bf585443cfa25ea0d5_24555_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>软路由的安装比较特殊，这里选择不使用任何介质&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2_hu0cee02120b2c9a165f3c3e4238f2cb7e_33423_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-2_hu0cee02120b2c9a165f3c3e4238f2cb7e_33423_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>由于没有使用UEFI的固件，这里保持默认，下一步&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3_huc1b9a9237f58ee84ea8b7616cb468d71_30151_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-3_huc1b9a9237f58ee84ea8b7616cb468d71_30151_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>不需要创建磁盘，直接点击删除，下一步&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4_hufef3690b0996a6d2c0159a25a06c69c0_35732_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-4_hufef3690b0996a6d2c0159a25a06c69c0_35732_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>&lt;strong>核心数&lt;/strong>和&lt;strong>插槽&lt;/strong>根据你的平台决定，软路由性能需求不高，可以保持默认，或者也可以设置到与你的平台情况一致，PVE会动态分配资源，无需担心类别可以保持默认，也可以选择host（据说性能更好）&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6_hu3914c277acb1998541c6a22203b3a8cd_24143_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-6_hu3914c277acb1998541c6a22203b3a8cd_24143_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>内存分配随意，这里保持默认&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7_hu7239a720725eef863bd773375ab261db_22399_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-7_hu7239a720725eef863bd773375ab261db_22399_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>网络保持默认即可，模型使用&lt;strong>半虚拟化&lt;/strong>据说性能更佳，但可能不兼容某些老设备&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8.png"
+width="720"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8_hu6e6becf96bcf73f7ffa542d234481912_29296_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-8_hu6e6becf96bcf73f7ffa542d234481912_29296_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;h2 id="安装istoreos固件">安装iStoreOS固件
+&lt;/h2>&lt;p>在&lt;a class="link" href="https://fw.koolcenter.com/iStoreOS/" target="_blank" rel="noopener"
+>KoolCenter 固件下载服务器&lt;/a>中下载自己平台对应的固件，由于我们使用的是PVE虚拟机，这里就下载x86_64的固件，下载完成后解压&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image.png"
+width="1109"
+height="36"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image_hu4a8d5d1f12812648351b126efcc89737_5217_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image_hu4a8d5d1f12812648351b126efcc89737_5217_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="3080"
+data-flex-basis="7393px"
+>&lt;/p>
+&lt;p>依次点击&lt;strong>local - ISO镜像 - 上传&lt;/strong>，将iStoreOS的镜像上传，注意复制一下你的文件名，等会需要使用&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10.png"
+width="404"
+height="269"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10_hu08db59084c4d17231a679b56bc895b39_12745_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-10_hu08db59084c4d17231a679b56bc895b39_12745_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>&lt;/p>
+&lt;p>选择宿主机的Shell功能，执行命令，这里的iso文件名是你即刚刚上传时的文件名&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qm importdisk &lt;span class="m">100&lt;/span> /var/lib/vz/template/iso/istoreos-22.03.6-2024051012-x86-64-squashfs-combined.img local-lvm
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>选择软路由虚拟机，选择&lt;strong>硬件&lt;/strong>，双击未使用的磁盘，点击添加，可以扩容一下磁盘，但不是必要的&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9.png"
+width="676"
+height="278"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9_hu5a404f922a2e3126f7e4a90626847515_36293_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-9_hu5a404f922a2e3126f7e4a90626847515_36293_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="243"
+data-flex-basis="583px"
+>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11.png"
+width="600"
+height="218"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11_hue4a06a61a7dd2d9d30ff3568b797b311_19618_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-11_hue4a06a61a7dd2d9d30ff3568b797b311_19618_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="275"
+data-flex-basis="660px"
+>&lt;/p>
+&lt;p>注意到这里已经有了第一个网卡，点击左上角的&lt;strong>添加 - 网络设备&lt;/strong>，将我们桥接的第二个网卡添加进去&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14.png"
+width="600"
+height="182"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14_hueabe0a70c57042b5451df8da4cf7c04d_20347_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-14_hueabe0a70c57042b5451df8da4cf7c04d_20347_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="329"
+data-flex-basis="791px"
+>&lt;/p>
+&lt;p>选择软路由虚拟机，选择&lt;strong>选项 - 引导顺序 -编辑&lt;/strong>，将刚刚添加的磁盘启动，并拖到最上方&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12.png"
+width="1307"
+height="727"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12_hu40741c1752d19b6b64e5824f2541c7a6_98116_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-12_hu40741c1752d19b6b64e5824f2541c7a6_98116_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13.png"
+width="640"
+height="267"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13_hu538f830d61e66881cd00ada61bd9a519_19478_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-13_hu538f830d61e66881cd00ada61bd9a519_19478_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="239"
+data-flex-basis="575px"
+>&lt;/p>
+&lt;h2 id="配置istoreos作为旁路由">配置iStoreOS作为旁路由
+&lt;/h2>&lt;p>此时启动软路由虚拟机，点击控制台，等待引导结束，系统启动&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15.png"
+width="2250"
+height="1037"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15_hubb8fd10a056ea98441e24069ad03a1c1_420930_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-15_hubb8fd10a056ea98441e24069ad03a1c1_420930_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="216"
+data-flex-basis="520px"
+>&lt;/p>
+&lt;p>按下回车键，进入命令行，输入命令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">quickstart
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用上下键选择选项&lt;strong>2&lt;/strong>
+&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16.png"
+width="390"
+height="159"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16_hu8e60265e5638429e2ce929bcae0d7be8_43134_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-16_hu8e60265e5638429e2ce929bcae0d7be8_43134_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="588px"
+>&lt;/p>
+&lt;p>这里输入之前为虚拟机预留的ip，我这里是&lt;code>192.168.99.2&lt;/code>，子网掩码输入&lt;code>255.255.255.0&lt;/code>，使用上下键选择&lt;code>quit&lt;/code>离开，重启虚拟机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17.png"
+width="623"
+height="42"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17_hu90c1e1d2a38a8a954073b1123b14c787_9012_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-17_hu90c1e1d2a38a8a954073b1123b14c787_9012_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1483"
+data-flex-basis="3560px"
+>&lt;/p>
+&lt;p>此时便可以在浏览器中输入&lt;code>192.168.99.2&lt;/code>进入iStoreOS的管理界面，默认的密码是&lt;code>password&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18.png"
+width="420"
+height="486"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18_hubfed1aa8e475298edb060dc40795db4d_146850_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-18_hubfed1aa8e475298edb060dc40795db4d_146850_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="207px"
+>&lt;/p>
+&lt;p>虽然出现危险的可能性不大，但还是建议现在&lt;strong>系统 - 管理权 - 路由器密码&lt;/strong>处先修改密码&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19.png"
+width="1123"
+height="488"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19_hu225cfc792244915e1e580a7eefcf385a_52990_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-19_hu225cfc792244915e1e580a7eefcf385a_52990_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="230"
+data-flex-basis="552px"
+>&lt;/p>
+&lt;p>点击&lt;strong>网络 - 接口 - 设备 - br-lan的配置&lt;/strong>，在网桥端口项将所有的网卡加入桥接&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-26.png"
+width="2538"
+height="540"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-26_hu6240ee3276a24ad16fefec8a02a1255e_116591_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-26_hu6240ee3276a24ad16fefec8a02a1255e_116591_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="470"
+data-flex-basis="1128px"
+>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-27.png"
+width="837"
+height="398"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-27_hu212228adfcf97d8b9fd3faa3b9e9d046_43075_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-27_hu212228adfcf97d8b9fd3faa3b9e9d046_43075_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="210"
+data-flex-basis="504px"
+>&lt;/p>
+&lt;p>因为我将软路由作为旁路由且不负责dhcp，所以不需要再添加接口，点击&lt;strong>网络向导&lt;/strong>，选择&lt;strong>配置为旁路由&lt;/strong>，在&lt;strong>手动配置&lt;/strong>中输入为&lt;code>192.168.99.2&lt;/code>，网关为主路由地址，关闭&lt;strong>DHCPv4服务&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20.png"
+width="600"
+height="886"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20_hueacf499a7a3140355ee3c5a391a7c974_59539_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-20_hueacf499a7a3140355ee3c5a391a7c974_59539_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="67"
+data-flex-basis="162px"
+>&lt;/p>
+&lt;p>点击&lt;strong>网络 - 接口 - lan - 编辑 - DHCP服务器 - 常规设置&lt;/strong>，选择&lt;strong>忽略此接口&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21.png"
+width="2428"
+height="784"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21_hu7006440cdcf4cbbb1d31cdd8b46afff1_119439_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8pve%E4%B8%AD%E9%85%8D%E7%BD%AE%E8%BD%AF%E8%B7%AF%E7%94%B1/image-21_hu7006440cdcf4cbbb1d31cdd8b46afff1_119439_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="309"
+data-flex-basis="743px"
+>&lt;/p>
+&lt;p>此时拔掉PC与软路由相连的网线，将作为主机的一个网口与主路由器的lan口连接，软路由能正常联网即表明配置成功，PC上的以太网设置也可以还原了&lt;/p>
+&lt;h2 id="结尾">结尾
+&lt;/h2>&lt;p>软路由的设置到这里就结束了&lt;/p></description></item></channel></rss>

@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Clonezilla on ratmomo's blog</title><link>https://ratmomo.github.io/tags/clonezilla/</link><description>Recent content in Clonezilla on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 13 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://ratmomo.github.io/tags/clonezilla/index.xml" rel="self" type="application/rss+xml"/><item><title>使用Clonezilla将PVE虚拟机迁移到物理机</title><link>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</link><pubDate>Thu, 13 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cover.jpg" alt="Featured image of post 使用Clonezilla将PVE虚拟机迁移到物理机" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>厌烦了虚拟机的性能损失和不稳定，思来想去整了个n1盒子作旁路由，决定把PVE中的虚拟机迁移到物理机上。找了一圈方案貌似Clonezilla最简单安全，所以决定试试。&lt;/p>
+&lt;blockquote>
+&lt;p>以下操作有危险，请保存好你的数据！！！&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="制作clonezilla启动盘">制作Clonezilla启动盘
+&lt;/h2>&lt;p>从&lt;a class="link" href="https://clonezilla.org/downloads.php" target="_blank" rel="noopener"
+>这里&lt;/a>下载Clonezilla的镜像文件，注意选择iso镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image.png"
+width="850"
+height="254"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image_hu3ef6e36e8cdd8b758ad7784b3d44e4bd_26514_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image_hu3ef6e36e8cdd8b758ad7784b3d44e4bd_26514_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="334"
+data-flex-basis="803px"
+>&lt;/p>
+&lt;p>使用烧录软件将U盘制作成启动盘，这里以&lt;strong>balenaEtcher&lt;/strong>为例，使用&lt;strong>Fusion&lt;/strong>等等也是可以的（注意烧录完成后如果弹出格式化硬盘，务必取消）&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-1.png"
+width="802"
+height="507"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-1_hud46ad1698bfffe367db0cd2f602fa344_22222_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-1_hud46ad1698bfffe367db0cd2f602fa344_22222_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;h2 id="备份系统">备份系统
+&lt;/h2>&lt;p>将u盘插入装有PVE虚拟机的主机上，登录PVE管理界面，点击&lt;strong>需要备份的虚拟机 - 硬件 - 添加 - USB设备&lt;/strong>，将刚刚插上的硬盘直通给虚拟机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-2.png"
+width="1430"
+height="804"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-2_hu84b2f55f0e5b363bac0c08b68babeed9_101282_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-2_hu84b2f55f0e5b363bac0c08b68babeed9_101282_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;p>点击&lt;strong>选项 - 引导顺序&lt;/strong>，将刚刚直通的usb启动，并拖到第一位，重启虚拟机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-3.png"
+width="1329"
+height="819"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-3_huf65cab0f4aa5ae52a627267bb914990e_99042_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-3_huf65cab0f4aa5ae52a627267bb914990e_99042_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="389px"
+>&lt;/p>
+&lt;p>进入Clonezilla后，使用上下键选择语言&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-4.png"
+width="1320"
+height="990"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-4_huf723d8fc8c47e8436491d15f6fd0fd47_131433_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-4_huf723d8fc8c47e8436491d15f6fd0fd47_131433_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>键盘配置保持默认&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-5.png"
+width="1320"
+height="990"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-5_hub4e14903614b3d84033ddfaa97f95339_66802_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-5_hub4e14903614b3d84033ddfaa97f95339_66802_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择使用再生龙&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-6.png"
+width="1320"
+height="990"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-6_hua1d94ee5d1611785be4d3527fca89e99_70563_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-6_hua1d94ee5d1611785be4d3527fca89e99_70563_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择第一项，保存到镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-7.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-7_hu923c49ea93f1e40ab1d4e648ad9b28b8_208000_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-7_hu923c49ea93f1e40ab1d4e648ad9b28b8_208000_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>我要把镜像保存到主机的机械硬盘中，所以直接选第一项，如果有别的需求可以按需选择（前提是已经将硬盘直通给虚拟机）&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-8.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-8_hu810d88f93f19d90c5a97155197b64f9f_176978_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-8_hu810d88f93f19d90c5a97155197b64f9f_176978_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>检查要储存备份的硬盘是否有正常显示，若正常使用&lt;code>Ctrl+C&lt;/code>退出此页面&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-9.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-9_hu99ea401d73ab9a5633aab87d9425d277_132431_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-9_hu99ea401d73ab9a5633aab87d9425d277_132431_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择要储存备份的硬盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-10.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-10_hu7c93139d6ebed1193a786cf05e7da7c7_226982_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-10_hu7c93139d6ebed1193a786cf05e7da7c7_226982_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择跳过检查&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-11.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-11_hu75524a657c21551f44fa9aee7500a9dd_145736_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-11_hu75524a657c21551f44fa9aee7500a9dd_145736_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择完目录后，点击选择&lt;code>Done&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-12.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-12_hu8c144fbe0dc7fada13a8bea1bd316b7c_145329_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-12_hu8c144fbe0dc7fada13a8bea1bd316b7c_145329_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择第一项&lt;code>初学模式&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-13.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-13_hue0569a1e9f5d514a58ffca1f855216a1_98257_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-13_hue0569a1e9f5d514a58ffca1f855216a1_98257_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择&lt;code>储存本机硬盘为镜像文件&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-14.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-14_hu88b2c62f90d337ad100e0e95b831edda_148672_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-14_hu88b2c62f90d337ad100e0e95b831edda_148672_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>输入镜像名称，默认即可&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-15.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-15_hu43fa6f0c8ed83cce4ed1cf44ff1b16b8_102981_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-15_hu43fa6f0c8ed83cce4ed1cf44ff1b16b8_102981_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择要备份的硬盘，一般sda是系统盘，按空格键选择&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-16.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-16_hu7667f2817f7a00923a66f3a2f08745f5_138500_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-16_hu7667f2817f7a00923a66f3a2f08745f5_138500_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择压缩方式，默认的第二项即可&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-17.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-17_hu88a4feb906a68fe82379cdc0791c043b_108785_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-17_hu88a4feb906a68fe82379cdc0791c043b_108785_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>跳过检查&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-18.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-18_hu1b09f2f90cae0e1f8bdb543e9e18e1f6_140262_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-18_hu1b09f2f90cae0e1f8bdb543e9e18e1f6_140262_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>跳过检查&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-19.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-19_huf91675b27c0a2ab56454036e91741ad0_110757_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-19_huf91675b27c0a2ab56454036e91741ad0_110757_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>选择不加密，当操作完成后选择关机&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-20.png"
+width="1382"
+height="1036"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-20_hu560f5b0791ccd1b316823ecc1868c3aa_88956_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/image-20_hu560f5b0791ccd1b316823ecc1868c3aa_88956_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;h2 id="恢复系统">恢复系统
+&lt;/h2>&lt;p>重启主机，进入Bios，将U盘设为引导顺序的第一位&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e223e37b64295f25d4fb9f0c587c0bd.jpg"
+width="2306"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e223e37b64295f25d4fb9f0c587c0bd_hu9bea9fb22eaed8138a5cca0fa29ea2a1_866452_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e223e37b64295f25d4fb9f0c587c0bd_hu9bea9fb22eaed8138a5cca0fa29ea2a1_866452_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="432px"
+>&lt;/p>
+&lt;p>进入Clonezilla，前面的选项照旧，这里的硬盘选择之前存储镜像的硬盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/ab437103f8e8ecba274ecd9c96f9860.jpg"
+width="3138"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/ab437103f8e8ecba274ecd9c96f9860_hu8f1f359a4f572c7af9c4c49fdaacbb95_1103748_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/ab437103f8e8ecba274ecd9c96f9860_hu8f1f359a4f572c7af9c4c49fdaacbb95_1103748_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="588px"
+>&lt;/p>
+&lt;p>目录选择之前存储镜像的目录&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4b6b372656b268eafc7d6b501d62468.jpg"
+width="2297"
+height="1279"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4b6b372656b268eafc7d6b501d62468_hu1464fe2373a97ca62cfc5ad5df644bef_502784_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4b6b372656b268eafc7d6b501d62468_hu1464fe2373a97ca62cfc5ad5df644bef_502784_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>选择初学模式&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cea8e115bb70a45be31210fc5614912.jpg"
+width="2305"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cea8e115bb70a45be31210fc5614912_hu1284ee02582a90eec8c5dc277c47e28a_282194_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cea8e115bb70a45be31210fc5614912_hu1284ee02582a90eec8c5dc277c47e28a_282194_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="432px"
+>&lt;/p>
+&lt;p>选择&lt;code>还原镜像文件到本机硬盘&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/c72979256e8f41b11cccd0cfb48e8ee.jpg"
+width="2940"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/c72979256e8f41b11cccd0cfb48e8ee_huec4c6f6769eb5a19fb5d4af3caa62cff_818277_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/c72979256e8f41b11cccd0cfb48e8ee_huec4c6f6769eb5a19fb5d4af3caa62cff_818277_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="229"
+data-flex-basis="551px"
+>&lt;/p>
+&lt;p>选择刚刚保存的镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e0acfd7a4bd6469ad3d26d8a42e5d07.jpg"
+width="2299"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e0acfd7a4bd6469ad3d26d8a42e5d07_hu126cab8290477c930325d4e0b4625ffd_250557_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/e0acfd7a4bd6469ad3d26d8a42e5d07_hu126cab8290477c930325d4e0b4625ffd_250557_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>选择部署系统的硬盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/098f380ed93e89475a221678d25caad.jpg"
+width="3138"
+height="1122"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/098f380ed93e89475a221678d25caad_hu4368701716ea6ac9e975869e9d0ee434_685040_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/098f380ed93e89475a221678d25caad_hu4368701716ea6ac9e975869e9d0ee434_685040_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="279"
+data-flex-basis="671px"
+>&lt;/p>
+&lt;p>选第一个模式&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4e699b3592e35534382547a911980b4.jpg"
+width="2299"
+height="1280"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4e699b3592e35534382547a911980b4_hu38304cc376829cd5d63ffe6af4723219_315153_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/4e699b3592e35534382547a911980b4_hu38304cc376829cd5d63ffe6af4723219_315153_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>选择&lt;code>重启&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cc58308f45f81a871ce930a2af1e2bf.jpg"
+width="2302"
+height="1279"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cc58308f45f81a871ce930a2af1e2bf_hu71b960db93c9e68546f4fe0afe778488_280001_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cc58308f45f81a871ce930a2af1e2bf_hu71b960db93c9e68546f4fe0afe778488_280001_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="431px"
+>&lt;/p>
+&lt;p>等待程序部署和修复引导完成，成功进入系统&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/2f941b0304955f26262101809a06a27.jpg"
+width="2318"
+height="1279"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/2f941b0304955f26262101809a06a27_huc0a0deaf080c3b53700171e429af7c9a_510687_480x0_resize_q75_box.jpg 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/2f941b0304955f26262101809a06a27_huc0a0deaf080c3b53700171e429af7c9a_510687_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="181"
+data-flex-basis="434px"
+>&lt;/p>
+&lt;h2 id="结尾">结尾
+&lt;/h2>&lt;p>这样系统的迁移就完成了，这样的部署方式有没有不良影响还未知，不过内网传输文件终于可以跑满带宽了，泪目&lt;/p></description></item></channel></rss>

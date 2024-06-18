@@ -1,4 +1,156 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>折腾 on ratmomo's blog</title><link>https://ratmomo.github.io/categories/%E6%8A%98%E8%85%BE/</link><description>Recent content in 折腾 on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 13 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://ratmomo.github.io/categories/%E6%8A%98%E8%85%BE/index.xml" rel="self" type="application/rss+xml"/><item><title>使用Clonezilla将PVE虚拟机迁移到物理机</title><link>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</link><pubDate>Thu, 13 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cover.jpg" alt="Featured image of post 使用Clonezilla将PVE虚拟机迁移到物理机" />&lt;h2 id="前言">前言
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>折腾 on ratmomo's blog</title><link>https://ratmomo.github.io/categories/%E6%8A%98%E8%85%BE/</link><description>Recent content in 折腾 on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 18 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://ratmomo.github.io/categories/%E6%8A%98%E8%85%BE/index.xml" rel="self" type="application/rss+xml"/><item><title>使用Docker部署PhotoPrism打造个人云相册</title><link>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/</link><pubDate>Tue, 18 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/cover.jpg" alt="Featured image of post 使用Docker部署PhotoPrism打造个人云相册" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>一不做二不休，准备部署一个云相册代替羸弱的系统云相册。找来找去还是锁定在了PhotoPrism和Immich之间。最终我选择了PhotoPrism，原因在于Immich不支持从本地的文件夹名称创建相册。&lt;/p>
+&lt;h1 id="部署前的准备">部署前的准备
+&lt;/h1>&lt;ul>
+&lt;li>本地服务器一台（安装好Docker和Docker Compose）&lt;/li>
+&lt;li>云服务器一台（用于内网穿透）&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装photoprism">安装PhotoPrism
+&lt;/h2>&lt;p>创建目录，用于存放&lt;code>docker-compose.yml&lt;/code>文件，PhotoPrism配置文件和图库&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo mkdir docker-compose/photoprism
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mkdir /disk1/Photo/import &lt;span class="c1"># 传入这个相册的图片会被识别，分类和整理到originals&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mkdir /disk1/Photo/originals &lt;span class="c1"># 已经分类好的相册放在这个目录下&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mkdir docker-compose/photoprism/storage &lt;span class="c1"># 配置文件和缓存存放的地方&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>下载PhotoPrism的docker-compose模板,并编辑&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> docker-compose/photoprism
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">wget https://dl.photoprism.app/docker/docker-compose.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo vim docker-compose.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>注意修改以下项目&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yml" data-lang="yml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">photoprism&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">photoprism/photoprism:latest&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 指定photoprism的镜像版本&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;2342:2342&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 修改端口&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">PHOTOPRISM_ADMIN_USER&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;admin&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 修改管理员用户名&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">PHOTOPRISM_ADMIN_PASSWORD&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;insecure&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 修改管理员密码，建议使用复杂密码&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">PHOTOPRISM_AUTH_MODE&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;password&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 身份验证模式，不用修改&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">PHOTOPRISM_SITE_URL&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;http://localhost:2342/&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 注意修改端口号，也可以直接注释掉&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># 由于不开放数据库，所以数据库部分的密码不用修改也没关系&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;/disk1/Photo/originals:/photoprism/originals&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 修改成刚刚创建的目录&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;/disk1/Photo/import:/photoprism/import&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 修改成刚刚创建的目录&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>启动服务&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo docker compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="设置语言">设置语言
+&lt;/h2>&lt;p>在浏览器输入主机的ip加端口打开PhotoPrism的登录页面，，输入刚刚设置的账号密码登录，颜值还是蛮高的&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image.png"
+width="628"
+height="517"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image_hue3f223af9a05714a3557845eb2e6a0e7_79768_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image_hue3f223af9a05714a3557845eb2e6a0e7_79768_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="121"
+data-flex-basis="291px"
+>&lt;/p>
+&lt;p>点击设置选项，将页面设置为中文&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-1.png"
+width="2529"
+height="884"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-1_hu396e125c375de5ba9de215db4a7dd7a8_132258_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-1_hu396e125c375de5ba9de215db4a7dd7a8_132258_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="286"
+data-flex-basis="686px"
+>&lt;/p>
+&lt;h2 id="导入图片到photoprism">导入图片到PhotoPrism
+&lt;/h2>&lt;h3 id="导入现有图片">导入现有图片
+&lt;/h3>&lt;p>现在我的相册空空如也（废话），需要将现有的相片导入到PhotoPrism。简单说一下我的需求，我有两种图片需要储存到PhotoPrism，一种是我存的大量的meme图和插画，这些图片我希望在PhotoPrism创建&lt;code>梗图&lt;/code>和&lt;code>插画&lt;/code>两个相册储存。另一种需要储存到PhotoPrism的图片是我拍摄的相片，我希望PhotoPrism能识别其中的元数据自动帮我分类存储。这就要用到前面创建的&lt;code>import&lt;/code>和&lt;code>originals&lt;/code>两个目录。简单的说这两个目录的不同在于&lt;/p>
+&lt;ul>
+&lt;li>originals: 已经分类好的相册放在这个目录下&lt;/li>
+&lt;li>import: 传入这个相册的图片会被识别，分类和整理到&lt;code>originals&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>所以只要将相片传到相应的文件夹即可&lt;/p>
+&lt;p>上传完成后打开PhotoPrism的web端，点击&lt;strong>资料库-索引-开始&lt;/strong>，索引刚刚传入&lt;code>originals&lt;/code>的图片&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-2.png"
+width="1601"
+height="813"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-2_hu564f3ba9bd70261e53b9c72a06c14800_65355_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-2_hu564f3ba9bd70261e53b9c72a06c14800_65355_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="196"
+data-flex-basis="472px"
+>&lt;/p>
+&lt;p>索引完成后点击文件夹，勾选刚刚索引的文件夹，右下角选择添加到相册&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-3.png"
+width="2560"
+height="1317"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-3_hu86661ccc8aabff92ab8b352d29f1a2a2_198758_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-3_hu86661ccc8aabff92ab8b352d29f1a2a2_198758_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="194"
+data-flex-basis="466px"
+>&lt;/p>
+&lt;p>随后回到&lt;strong>资料库&lt;/strong>，点击&lt;strong>导入&lt;/strong>，将&lt;code>import&lt;/code>目录下的照片导入&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-4.png"
+width="1560"
+height="440"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-4_hu3824dbbf24c67c8d5f322feb59da1c70_39224_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2photoprism%E6%89%93%E9%80%A0%E4%B8%AA%E4%BA%BA%E4%BA%91%E7%9B%B8%E5%86%8C/image-4_hu3824dbbf24c67c8d5f322feb59da1c70_39224_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="354"
+data-flex-basis="850px"
+>&lt;/p>
+&lt;h3 id="图片同步">图片同步
+&lt;/h3>&lt;p>之后的照片同步可以使用&lt;a class="link" href="www.photosync-app.com" >photosync&lt;/a>来实现，这也是官方推荐的方式。不过&lt;strong>photosync&lt;/strong>的界面略显古老，相关的功能也需要收费，遂放弃。最后选择了&lt;strong>FolderSync&lt;/strong>进行同步。
+简单提一嘴，可以通过&lt;strong>samba&lt;/strong>服务利用smb协议来同步文件，也可以使用&lt;strong>webdav&lt;/strong>的方式。&lt;strong>Photoprism&lt;/strong>也自带了简单的&lt;strong>webdav&lt;/strong>服务。不过&lt;strong>FolderSync&lt;/strong>要使用&lt;strong>Photoprism&lt;/strong>自带的&lt;strong>webdav&lt;/strong>需要先配置Photoprism的https&lt;/p>
+&lt;h3 id="参考">参考
+&lt;/h3>&lt;blockquote>
+&lt;p>&lt;a class="link" href="https://docs.photoprism.app/getting-started/docker-compose/#database" target="_blank" rel="noopener"
+>Docker Compose - PhotoPrism&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://taoofcoding.tech/blogs/2024-01-07/the-tutor-of-build-your-photopri" target="_blank" rel="noopener"
+>Photoprism教程：建立你的私人云相册 | 微言码道&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://docs.photoprism.app/user-guide/sync/webdav/" target="_blank" rel="noopener"
+>WebDAV - PhotoPrism&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://docs.photoprism.app/user-guide/organize/folders/" target="_blank" rel="noopener"
+>Folders - PhotoPrism&lt;/a>&lt;/p>
+&lt;/blockquote></description></item><item><title>使用Clonezilla将PVE虚拟机迁移到物理机</title><link>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</link><pubDate>Thu, 13 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8clonezilla%E5%B0%86pve%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%88%B0%E7%89%A9%E7%90%86%E6%9C%BA/cover.jpg" alt="Featured image of post 使用Clonezilla将PVE虚拟机迁移到物理机" />&lt;h2 id="前言">前言
 &lt;/h2>&lt;p>厌烦了虚拟机的性能损失和不稳定，思来想去整了个n1盒子作旁路由，决定把PVE中的虚拟机迁移到物理机上。找了一圈方案貌似Clonezilla最简单安全，所以决定试试。&lt;/p>
 &lt;blockquote>
 &lt;p>以下操作有危险，请保存好你的数据！！！&lt;/p>
