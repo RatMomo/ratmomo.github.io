@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>密码管理 on ratmomo's blog</title><link>https://ratmomo.github.io/tags/%E5%AF%86%E7%A0%81%E7%AE%A1%E7%90%86/</link><description>Recent content in 密码管理 on ratmomo's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 11 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://ratmomo.github.io/tags/%E5%AF%86%E7%A0%81%E7%AE%A1%E7%90%86/index.xml" rel="self" type="application/rss+xml"/><item><title>使用Docker部署安装Bitwarden</title><link>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/</link><pubDate>Tue, 11 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/cover.jpg" alt="Featured image of post 使用Docker部署安装Bitwarden" />&lt;h2 id="bitwarden密码管理器">Bitwarden密码管理器
+&lt;/h2>&lt;p>Bitwarden是一款开源跨平台的密码管理器，你可以选择自己部署密码库，而不需要经过第三方的服务器。总之为了摆脱恼人的Edge，首先要部署代替的密码管理器和迁移密码。&lt;/p>
+&lt;h2 id="部署前的准备">部署前的准备
+&lt;/h2>&lt;ul>
+&lt;li>一台装有&lt;strong>docker&lt;/strong>及&lt;strong>docker-compose&lt;/strong>，&lt;strong>nginx&lt;/strong>的服务器&lt;/li>
+&lt;li>一个可以使用的域名&lt;/li>
+&lt;/ul>
+&lt;p>在这里贴上官方提供的配置要求:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;/th>
+&lt;th>Minimum&lt;/th>
+&lt;th>Recommended&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Processor&lt;/td>
+&lt;td>x64, 1.4GHz&lt;/td>
+&lt;td>x64, 2GHz dual core&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Memory&lt;/td>
+&lt;td>2GB RAM&lt;/td>
+&lt;td>2GB RAM&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Storage&lt;/td>
+&lt;td>12GB&lt;/td>
+&lt;td>25GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Docker Version&lt;/td>
+&lt;td>Engine 26+ and Compose&lt;/td>
+&lt;td>Engine 26+ and Compose&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="创建一个专门用于bitwarden的用户">创建一个专门用于Bitwarden的用户
+&lt;/h2>&lt;p>根据Bitwarden官方的建议，创建一个专门用于Bitwarden的用户，以便隔绝Bitwarden与其他应用程序&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo adduser bitwarden &lt;span class="c1"># 使用Ubantu的话，这一步就需要输入密码&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo passwd bitwarden &lt;span class="c1"># 建议使用强密码并妥善保管&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo groupadd docker &lt;span class="c1"># 如果安装了docker一般情况下docker用户组已经存在&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo usermod -aG docker bitwarden
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mkdir /opt/bitwarden
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo chmod -R &lt;span class="m">700&lt;/span> /opt/bitwarden
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo chown -R bitwarden:bitwarden /opt/bitwarden
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="部署bitwarden">部署Bitwarden
+&lt;/h2>&lt;p>切换到bitwarden用户&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">su bitwarden
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>下载官方提供的安装脚本&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl -Lso bitwarden.sh &lt;span class="s2">&amp;#34;https://func.bitwarden.com/api/dl/?app=self-host&amp;amp;platform=linux&amp;#34;&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> chmod &lt;span class="m">700&lt;/span> bitwarden.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在安装前需要先到&lt;a class="link" href="https://bitwarden.com/host/" target="_blank" rel="noopener"
+>Bitwarden官网&lt;/a>获取安装id和密钥，需要用到一个邮箱地址，随后运行脚本执行安装命令，根据提示填写即可&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">./bitwarden.sh install
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>安装完成后需要修改配置文件和环境变量文件，首先修改&lt;strong>config.yml&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vim ./bwdata/config.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>主要修改以下两个设置：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Docker compose file port mapping for HTTP. Leave empty to remove the port mapping.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Learn more: https://docs.docker.com/compose/compose-file/#ports&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">http_port&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">30080&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 修改成80意外的端口防止冲突&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c">#&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Docker compose file port mapping for HTTPS. Leave empty to remove the port mapping.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Learn more: https://docs.docker.com/compose/compose-file/#ports&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">https_port&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 禁用https&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>随后修改&lt;strong>global.override.env&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vim ./bwdata/env/global.override.env
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">globalSettings__mail__replyToEmail=no-reply@bitwarden.ratmomo.tech&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 修改成你的邮箱以获得smtp服务&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">globalSettings__mail__smtp__host=REPLACE &lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">globalSettings__mail__smtp__port=587&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">globalSettings__mail__smtp__ssl=false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">globalSettings__mail__smtp__username=REPLACE&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">globalSettings__mail__smtp__password=REPLACE&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">globalSettings__disableUserRegistration=false&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 个人使用的话，在创建完账户后建议设置成true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">adminSettings__admins=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 修改成你的邮箱&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>outlook的用户可以&lt;a class="link" href="https://support.microsoft.com/zh-cn/office/outlook-com-%E7%9A%84-pop-imap-%E5%92%8C-smtp-%E8%AE%BE%E7%BD%AE-d088b986-291d-42b8-9564-9c414e2aa040" target="_blank" rel="noopener"
+>在此&lt;/a>找到相关配置&lt;/p>
+&lt;/blockquote>
+&lt;p>修改完成后运行以下命令：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">./bitwarden.sh rebuild
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">./bitwarden.sh start
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>完成后可以使用&lt;code>docker ps&lt;/code>验证是否正常运行&lt;/p>
+&lt;h2 id="设置反代">设置反代
+&lt;/h2>&lt;p>个人使用强烈建议选择&lt;strong>Nginx proxy manager&lt;/strong>代替&lt;strong>Nginx&lt;/strong>，以下以&lt;strong>npm&lt;/strong>为例演示：&lt;/p>
+&lt;p>登录&lt;strong>npm&lt;/strong>的WEB管理页面，选择&lt;code>Add Proxy Host&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/1.png"
+width="393"
+height="44"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/1_huf8ae256ea3097dc061ccdd3dcb8cd0a4_3264_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/1_huf8ae256ea3097dc061ccdd3dcb8cd0a4_3264_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="893"
+data-flex-basis="2143px"
+>&lt;/p>
+&lt;p>在&lt;strong>Domain Names&lt;/strong>输入你的域名，例如：&lt;code>bitwarden.example.com&lt;/code>。在&lt;strong>Forward Hostname/IP&lt;/strong>输入服务器的IP地址，例如：&lt;code>192.168.1.2&lt;/code>。端口填入刚刚设置的端口，建议打开下方的三个选项&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/2.png"
+width="501"
+height="549"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/2_hu4beb862e9e1084efa50abcf5d3e55d3c_25721_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/2_hu4beb862e9e1084efa50abcf5d3e55d3c_25721_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="91"
+data-flex-basis="219px"
+>&lt;/p>
+&lt;p>点击SSL，选择&lt;strong>Request a new SSL Certificate&lt;/strong>，建议打开&lt;strong>Force SSl&lt;/strong>和&lt;strong>HTTP/2 Support&lt;/strong>两个选项，再在下方填入你的邮箱，勾选同意协议以获取SSL证书&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/3.png"
+width="501"
+height="557"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/3_hu55a2115b4079f9380143bc8228bc6957_30583_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/3_hu55a2115b4079f9380143bc8228bc6957_30583_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="89"
+data-flex-basis="215px"
+>&lt;/p>
+&lt;p>到这一步基本上已经可以通过刚刚设置的域名访问自己的BitWarden页面了,随后注册账户即可使用密码库&lt;/p>
+&lt;h2 id="番外篇导入edgechrome密码">番外篇：导入Edge/Chrome密码
+&lt;/h2>&lt;p>在Edge/Chrome的密码管理界面选择导出&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/4.png"
+width="947"
+height="166"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/4_hu2f5cd9a9b77316f0d943f8bd838f911e_27342_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/4_hu2f5cd9a9b77316f0d943f8bd838f911e_27342_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="570"
+data-flex-basis="1369px"
+>&lt;/p>
+&lt;p>在Bitwarden的管理页面中选择工具菜单下的导入数据，再在文件格式菜单中选择&lt;code>Chrome(CSV)&lt;/code>，上传刚刚导出的csv文件，点击导入数据按钮即可&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/5.png"
+width="1082"
+height="757"
+srcset="https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/5_hu9da6740a5b43b83f25486f57682b3492_65007_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E4%BD%BF%E7%94%A8docker%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85bitwarden/5_hu9da6740a5b43b83f25486f57682b3492_65007_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="343px"
+>&lt;/p>
+&lt;h2 id="参考">参考
+&lt;/h2>&lt;blockquote>
+&lt;p>&lt;a class="link" href="https://bitwarden.com/help/install-on-premise-linux/" target="_blank" rel="noopener"
+>Linux Standard Deployment | Bitwarden Help Center&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://www.horosama.com/archives/338" target="_blank" rel="noopener"
+>bitwarden部署和使用记录 – 萌萌哒赫萝的小站&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://blog.xollipop.top/2023/06/01/bitwarden/" target="_blank" rel="noopener"
+>如何搭建一个私人的bitwarden密码管理工具服务端(保姆级教程) | Sola&amp;rsquo;s Blog&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://bitwarden.com/help/import-from-chrome/" target="_blank" rel="noopener"
+>Import Data from Google Chrome | Bitwarden Help Center&lt;/a>&lt;/p>
+&lt;/blockquote></description></item></channel></rss>

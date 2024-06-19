@@ -575,4 +575,208 @@ data-flex-basis="743px"
 >&lt;/p>
 &lt;p>此时拔掉PC与软路由相连的网线，将作为主机的一个网口与主路由器的lan口连接，软路由能正常联网即表明配置成功，PC上的以太网设置也可以还原了&lt;/p>
 &lt;h2 id="结尾">结尾
-&lt;/h2>&lt;p>软路由的设置到这里就结束了&lt;/p></description></item></channel></rss>
+&lt;/h2>&lt;p>软路由的设置到这里就结束了&lt;/p></description></item><item><title>在物理机上安装PVE</title><link>https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/</link><pubDate>Fri, 07 Jun 2024 00:00:00 +0000</pubDate><guid>https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/</guid><description>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/cover.jpg" alt="Featured image of post 在物理机上安装PVE" />&lt;h2 id="部署前的准备">部署前的准备
+&lt;/h2>&lt;ul>
+&lt;li>U盘一个&lt;/li>
+&lt;li>PC一台，提前安装好&lt;strong>rufus&lt;/strong>或&lt;strong>balenaEtcher&lt;/strong>等软件用于制作启动盘&lt;/li>
+&lt;/ul>
+&lt;p>我用于搭建All in One的配置如下：&lt;/p>
+&lt;table>
+&lt;tr>
+&lt;td>主板&lt;/td>
+&lt;td>B365&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CPU&lt;/td>
+&lt;td>i3-8100&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>内存&lt;/td>
+&lt;td>DDR4 16Gx2&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>硬盘&lt;/td>
+&lt;td>致钛PC005 512G&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td> &lt;/td>
+&lt;td>西数HC510&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td> &lt;/td>
+&lt;td>西数HC510&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>电源&lt;/td>
+&lt;td>海韵SSP-250SUB&lt;/td>
+&lt;/tr>
+&lt;/table>
+&lt;h2 id="安装pve">安装PVE
+&lt;/h2>&lt;p>从&lt;a class="link" href="https://www.proxmox.com/en/downloads" target="_blank" rel="noopener"
+>PVE官网下载页面&lt;/a>下载安装镜像，这里我选择的是最新的 8.2 版本&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1.png"
+width="1353"
+height="933"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1_hu28d41a32c9fe14be76f637c3cfb8e3d5_116383_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/1_hu28d41a32c9fe14be76f637c3cfb8e3d5_116383_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="145"
+data-flex-basis="348px"
+>&lt;/p>
+&lt;p>将你的u盘插入PC，使用启动盘制作软件制作启动盘，这里以&lt;strong>balenaEtcher&lt;/strong>为例：
+打开&lt;strong>balenaEtcher&lt;/strong>，选择从&lt;strong>文件烧录&lt;/strong>，再选择刚刚下载的镜像&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2.png"
+width="802"
+height="507"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2_hu3f3e120e428ecd3e9c0ef9063bb8f29a_24180_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/2_hu3f3e120e428ecd3e9c0ef9063bb8f29a_24180_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;p>选择你插入的U盘&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3.png"
+width="802"
+height="507"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3_huf045ea4e15598d48d2da6596faa30058_25750_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/3_huf045ea4e15598d48d2da6596faa30058_25750_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;p>再点击立即烧录即可，&lt;strong>注意不要点击可能弹窗的格式化U盘&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4.png"
+width="802"
+height="507"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4_hu0518109736a0561937288e6fa29bf818_17742_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/4_hu0518109736a0561937288e6fa29bf818_17742_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;p>将U盘从PC弹出，插入到将要安装PVE的主机，随后通过U盘引导开机（可能需要进入BIOS进行设置），这里直接回车执行第一项安装命令&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5.png"
+width="2195"
+height="761"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5_hu4e453fbd289f2ee9a959a2d53eb0489b_367478_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/5_hu4e453fbd289f2ee9a959a2d53eb0489b_367478_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="288"
+data-flex-basis="692px"
+>&lt;/p>
+&lt;p>在协议界面选择&lt;strong>I aggree&lt;/strong>后，选择安装的硬盘，根据你的情况选择硬盘，这里我选择的是512G的那块固态，next&lt;/p>
+&lt;p>区域设置界面，在&lt;strong>Country&lt;/strong>选项中选择&lt;strong>China&lt;/strong>，next&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6.png"
+width="1533"
+height="597"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6_hu0789b667699a5e758e84086d4a965162_304632_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/6_hu0789b667699a5e758e84086d4a965162_304632_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="256"
+data-flex-basis="616px"
+>&lt;/p>
+&lt;p>密码设置界面，输入你的密码，建议设置的复杂一点，next&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7.png"
+width="843"
+height="416"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7_hu167812322c42da9f67eb081623c1f772_95163_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/7_hu167812322c42da9f67eb081623c1f772_95163_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="486px"
+>&lt;/p>
+&lt;p>网络设置界面，选择一个网卡作为pve的管理入口，这里我有两个网卡我选择了第一个，&lt;strong>Hostname&lt;/strong>可以任意设置一个，&lt;strong>IP Address&lt;/strong>如果你不想把软路由设置成主路由，就把地址设置到和你的主路由同一个网段，例如我想把软路由作为旁路由，所以将ip设置为&lt;code>192.168.99.3&lt;/code>，&lt;strong>Gateway&lt;/strong>则设置为主路由的地址&lt;code>192.168.99.1&lt;/code>。如果准备将软路由作为主路由，则ip可以在局域网网段下任意设置，但注意不要设置成之后为软路由预留的地址，不过之后的教程只会介绍前一个方案。&lt;strong>DNS Server&lt;/strong>保持默认即可，next，Install&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8.png"
+width="1731"
+height="660"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8_hue22e2f90e8f48ccf9684ed9c2c4e39a7_458526_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/8_hue22e2f90e8f48ccf9684ed9c2c4e39a7_458526_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="262"
+data-flex-basis="629px"
+>&lt;/p>
+&lt;h2 id="连接pve">连接PVE
+&lt;/h2>&lt;p>点击reboot，关机完成重启前拔出启动盘，让机器通过硬盘引导，随后直接将PC的网口连接到All in One主机刚刚选择作为管理口的网口，以防错误我们主动将PC和主机设置同一网段，如果是&lt;strong>Windows 11&lt;/strong>的话，打开&lt;strong>设置 - 网络和Internet - 高级网络设置 - 以太网（注意是你PC的网卡对应的以太网）- Internet 协议版本 4（TCP/IPv4）- 属性&lt;/strong>，将PC的ip地址设置成同一个网段，这里用的是&lt;code>192.168.99.99&lt;/code>，子网掩码保持默认，默认网关设置成为软路由预设的网关，点击确定即可&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9.png"
+width="1319"
+height="693"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9_hu7f9402435d5955ed17297bd656233a67_149980_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/9_hu7f9402435d5955ed17297bd656233a67_149980_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="190"
+data-flex-basis="456px"
+>&lt;/p>
+&lt;p>随后打开PC的浏览器，输入&lt;code>192.168.99.3:8006&lt;/code>，如果提示不是私密连接则点高级再点击继续前往&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10.png"
+width="639"
+height="547"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10_hu639a1d41bd821cc0fbeee33c3352dc91_56452_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/10_hu639a1d41bd821cc0fbeee33c3352dc91_56452_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="116"
+data-flex-basis="280px"
+>&lt;/p>
+&lt;p>打开PVE管理页面后，在&lt;strong>用户名&lt;/strong>输入root，密码即为安装时设置的密码，最后一个选项可以设置语言&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11.png"
+width="400"
+height="196"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11_hu0cea37fc23deb949abe4d66153b799b6_12064_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/11_hu0cea37fc23deb949abe4d66153b799b6_12064_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="204"
+data-flex-basis="489px"
+>&lt;/p>
+&lt;h2 id="配置网卡">配置网卡
+&lt;/h2>&lt;p>作为旁路由的软路由其实只需要一个网口，但是既然我们有两个网卡也不能浪费。在PVE中点击你的宿主机，选择&lt;strong>系统 - 网络&lt;/strong>。可以看到其中一个网卡PVE已经自动为我们完成了桥接&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12.png"
+width="656"
+height="71"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12_hu6125e3d56b4631aa3cccccc0e88434be_7155_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/12_hu6125e3d56b4631aa3cccccc0e88434be_7155_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="923"
+data-flex-basis="2217px"
+>&lt;/p>
+&lt;p>点击&lt;strong>创建 - Linux Bridge&lt;/strong>，在桥接端口中输入第二个网卡的名称，点击创建&lt;/p>
+&lt;p>&lt;img src="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13.png"
+width="600"
+height="250"
+srcset="https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13_hue37e230f51cf6d777e5271b330206d5a_17776_480x0_resize_box_3.png 480w, https://ratmomo.github.io/p/2024/06/%E5%9C%A8%E7%89%A9%E7%90%86%E6%9C%BA%E4%B8%8A%E5%AE%89%E8%A3%85pve/13_hue37e230f51cf6d777e5271b330206d5a_17776_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="alt text"
+class="gallery-image"
+data-flex-grow="240"
+data-flex-basis="576px"
+>&lt;/p>
+&lt;h2 id="硬件直通的预先准备">硬件直通的预先准备
+&lt;/h2>&lt;p>需要提前主板bios中开启虚拟化功能，不同的平台设置不同。开启虚拟化后，点击宿主机的Shell功能，修改&lt;strong>grub&lt;/strong>配置&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vim /etc/default/grub &lt;span class="c1"># 没有vim则apt安装，或者使用vi&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>将&lt;code>GRUB_CMDLINE_LINUX_DEFAULT&lt;/code>项修改为&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">GRUB_CMDLINE_LINUX_DEFAULT=&amp;#34;quiet intel_iommu=on iommu=pt&amp;#34;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>修改完成后更新&lt;strong>grup&lt;/strong>，并重启&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">update-grub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">reboot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="结尾">结尾
+&lt;/h2>&lt;p>至此，PVE已经可以正常使用了，关于换源等PVE优化并非必要，网上有很多其他教程可以参考&lt;/p></description></item></channel></rss>
